@@ -1,0 +1,247 @@
+import promise from 'es6-promise'
+promise.polyfill()
+import axios from 'axios'
+import * as types from '../types.js'
+
+const state = {
+    userTsr: '', //员工信息
+    chatData: '', //聊天列表
+    myChatData: '', //我自己
+    nowChat: '',    //当前聊天
+    chatRecordList: '',
+    chatRecordMessageL: '',
+    clientPortrayalData: '',
+    clientFooterData: '',
+    messageData: '',
+    getMoreMessage: ''
+}
+const mutations = {
+
+}
+
+const actions = {
+    //员工信息
+    [types.CLIENT_LIST]({ commit }, { starNumData, successCallback = () => { }, failCallback = () => { } }) {
+        axios({
+            method: 'post',
+            url: '/tpdwt_web/toChatIndex.html',
+            data: starNumData,
+            "Content-Type": "multipart/form-data"
+        }).then((res) => {
+            var result = res.data
+            // console.log(result)
+            if (result.responseCode == 0) {
+                state.userTsr = result.result
+                window.localStorage.setItem('userTsr', JSON.stringify(result.result))
+                successCallback()
+            } else {
+                console.log('数据未取到')
+            }
+
+        }).catch(function (err) {
+            failCallback()
+            let res = err.response
+            if (err) {
+               console.log('第一次请求' + res)
+            }
+        })
+    },
+    // 客户列表
+    [types.CLIENT_LIST_GAIN]({ commit }, { clientMessage, successCallback = () => { }, failCallback = () => { } }) {
+        axios({
+            method: 'post',
+            url: '/tpdwt_web/chat/getChatList.html',
+            data: clientMessage,
+            "Content-Type": "multipart/form-data"
+        }).then((res) => {
+            var result = res.data
+            // console.log(result)
+            if (result.responseCode == 0) {
+                state.myChatData = result.result.selfChatList
+                state.chatData = result.result.chatList
+                state.nowChat = result.result.OnlineChatList
+                // state.chatRecordList = result.result.chatRecordList
+                successCallback()
+            } else {
+                console.log('列表未取到，请联系管理员！')
+            }
+
+        }).catch(function (err) {
+            failCallback()
+            let res = err.response
+            if (err) {
+                console.log('查询列表出错1111111 ' + res)
+            }
+        })
+    },
+    // 客户列表聊天信息
+    [types.CLIENT_LIST_RECORD]({ commit }, { chatRecordMessageL, successCallback = () => { }, failCallback = () => { } }) {
+        axios({
+            method: 'post',
+            url: '/tpdwt_web/chat/getChatRecord.html',
+            data: chatRecordMessageL,
+            "Content-Type": "multipart/form-data"
+        }).then((res) => {
+            var result = res.data
+            // console.log(result)
+            if (result.responseCode == 0) {
+                state.chatRecordList = result.result
+                successCallback()
+            } else {
+                console.log('客户列表聊天信息')
+            }
+
+        }).catch(function (err) {
+            console.log(err)
+            failCallback()
+            let res = err.response
+            if (err) {
+                // window.alert('api error, HTTP CODE: ' + res)
+            }
+        })
+    },
+        // 客户列表聊天信息轮循
+    [types.SEND_MESSAGE]({ commit }, { sendMessage, successCallback = () => { }, failCallback = () => { }, failCallbackTwo = () => { } }) {
+        axios({
+            method: 'post',
+            url: '/tpdwt_web/chat/sendMessage.html',
+            data: sendMessage,
+            traditional: true,//属性在这里设置
+        }).then((res) => {
+            var result = res.data
+            state.messageData = result.result
+            if (result.responseCode == 0) {
+                successCallback()
+            } else if (result.responseCode == 1){
+                alert(result.msg)
+                failCallbackTwo()
+            } else if (result.responseCode == 3) {
+                alert(result.msg)
+                failCallback()
+            } else if (result.responseCode == 9) {
+                alert(result.msg)
+            }
+        }).catch(function (err) {
+            
+            let res = err.response
+            if (err) {
+                console.log('客户信息轮播出错' + res)
+            }
+        })
+    },
+    // 客户画像
+    [types.CLIENT_PORTRAYAL]({ commit }, { chatRecordMessageL, successCallback = () => { }, failCallback = () => { } }) {
+        axios({
+            method: 'post',
+            url: '/tpdwt_web/toGetClient.html',
+            data: chatRecordMessageL,
+            "Content-Type": "multipart/form-data"
+        }).then((res) => {
+            var result = res.data
+            // console.log(result)
+            if (result.responseCode == 0) {
+                state.clientPortrayalData = result.result
+                successCallback()
+            } else {
+                failCallback()
+            }
+
+        }).catch(function (err) {
+            failCallback()
+            let res = err.response
+            if (err) {
+                console.log('画像 ' + res)
+            }
+        })
+    },
+    // 客户足迹
+    [types.CLIENT_FOOTER]({ commit }, { chatRecordMessageL, successCallback = () => { }, failCallback = () => { } }) {
+        axios({
+            method: 'post',
+            url: '/tpdwt_web/toGetClientFootprint.html',
+            data: chatRecordMessageL,
+            "Content-Type": "multipart/form-data"
+        }).then((res) => {
+            var result = res.data
+            // console.log(result)
+            if (result.responseCode == 0) {
+                state.clientFooterData = result.result
+                successCallback()
+            } else {
+                failCallback()
+                // alert('列表未取到客户足迹')
+            }
+
+        }).catch(function (err) {
+            failCallback()
+            let res = err.response
+            if (err) {
+                console.log('足迹 ' + res)
+            }
+        })
+    },
+    // 滚动消息刷新
+    [types.GET_MORE_MESS]({ commit }, { getMoreMessData, successCallback = () => { }, failCallback = () => { } }) {
+        axios({
+            method: 'post',
+            url: '/tpdwt_web/chat/getChatRecord.html',
+            data: getMoreMessData,
+            "Content-Type": "multipart/form-data"
+        }).then((res) => {
+            var result = res.data
+            // console.log(result)
+            if (result.responseCode == 0) {
+                state.getMoreMessage = result.result
+                successCallback()
+            } else {
+                failCallback()
+                // alert('列表未取到客户足迹')
+            }
+
+        }).catch(function (err) {
+            failCallback()
+            let res = err.response
+            if (err) {
+                console.log('向上滚动获取消息失败 ' + res)
+            }
+        })
+    },
+
+}
+
+const getters = {
+    userTsr(state) {
+        return state.userTsr
+    },
+    chatData(state) {
+        return state.chatData
+    },
+    myChatData(state) {
+        return state.myChatData
+    },
+    nowChat(state) {
+        return state.nowChat
+    },
+    chatRecordList(state) {
+        return state.chatRecordList
+    },
+    clientPortrayalData(state) {
+        return state.clientPortrayalData
+    },
+    clientFooterData(state) {
+        return state.clientFooterData
+    },
+    messageData(state) {
+        return state.messageData
+    },
+    getMoreMessage(state) {
+        return state.getMoreMessage
+    },
+}
+export default {
+    state,
+    actions,
+    mutations,
+    getters
+}
+
