@@ -14,7 +14,7 @@ module.exports = {
     proxyTable: {
       '/tpdwt_web/': {
         // target: 'http://10.1.117.3:8001', // 你接口的域名
-        target: 'http://10.7.181.153:8090', // 你接口的域名
+        target: 'http://10.7.181.159:8090', // 你接口的域名
         secure: false,
         changeOrigin: true,
         pathRewrite: {
