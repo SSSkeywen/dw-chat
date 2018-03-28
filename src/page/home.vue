@@ -70,7 +70,7 @@
            <!-- / <p  @click="returnBtn(1)"> {{ tsrnoBadingData}}</p> -->
              
              
-            <div>
+            <div @click="newPoto">
               <img src="../../static/images/headPortrait.jpg" alt="" v-if="isMeImgPt">
               <img :src="'/tpdwt_web/chat/getFile.html?filePath='+accessphotourl" alt="" v-else>
             </div>
@@ -241,8 +241,8 @@ export default {
   },
   data() {
     return {
-      isbigImg: false,//图片放大蒙版是否显示
-      bigImgData: "",//大图路径
+      isbigImg: false, //图片放大蒙版是否显示
+      bigImgData: "", //大图路径
       isMeImgPt: "",
       tenData: "",
       contentText: false,
@@ -330,6 +330,7 @@ export default {
     this.goOnFnTwo();
     this.bottomshow();
     this.judge();
+    this.selsectWindow();
   },
   methods: {
     ...mapActions({
@@ -352,8 +353,51 @@ export default {
       returnDxFn: types.RETURNDX,
       returnDxFn1: types.TSRUNBIND,
       getMoreMess: types.GET_MORE_MESS,
-      upSataStatus: types.UPDATACHATSTATUS
+      upSataStatus: types.UPDATACHATSTATUS,
+      getTsrHeadFn: types.GETTSRHEAD,
     }),
+    //点击更新头像的方法
+    newPoto(){
+      let userTsrL = JSON.parse(window.localStorage.getItem("userTsr"));
+      let getTsrHeadData = new FormData();
+      getTsrHeadData.append("tsrno", userTsrL.TSR_SESSION.tsrno);
+      this.getTsrHeadFn({
+        getTsrHeadData,
+        successCallback: () => {
+          location.reload()
+        },
+        failCallback: () => {}
+      })
+    },
+    //切换页面函数
+    selsectWindow() {
+      // window.blur(function(){
+      //   this.selectChat(0);
+      // })
+      // window.onblur = function() {
+      //   // 切换出页面执行事件
+      //   console.log(this.selectIndex);
+      //   this.selectChat(0);
+      // };
+      var newMun;
+      window.onblur = () => {
+        console.log("失去焦点");
+
+        newMun = this.selectIndex;
+        this.selectChat(0);
+        console.log(this.selectIndex);
+      };
+      window.onfocus = () => {
+        console.log("进入页面");
+        console.log(newMun);
+        this.selectChat(newMun);
+      };
+      // window.onfocus = function() {
+      //   // 切换出页面执行事件
+      //   console.log("进入页面");
+      //   // this.selectChat(0);
+      // };
+    },
     //轮训函数
     goOnFnTwo() {
       setTimeout(() => {
@@ -447,12 +491,12 @@ export default {
     //图片放大函数
     imgbig(imgruldata) {
       // alert(imgruldata);
-      this.isbigImg = true
-      this.bigImgData = '/tpdwt_web/chat/getFile.html?filePath='+imgruldata
+      this.isbigImg = true;
+      this.bigImgData = "/tpdwt_web/chat/getFile.html?filePath=" + imgruldata;
     },
     //关闭图片放大
-    closeBigImg(){
-      this.isbigImg = false
+    closeBigImg() {
+      this.isbigImg = false;
     },
     selectClientNameDataTwo() {
       let clientMessageData = {};
@@ -826,7 +870,7 @@ export default {
         chatRecordMessageL,
         successCallback: () => {
           this.mesageList = this.$store.getters.chatRecordList;
-          console.log(this.mesageList)
+          console.log(this.mesageList);
           if (this.$store.getters.chatRecordList != "0") {
             // alert(11)
             for (let i = 0; i < this.mesageList.length; i++) {
@@ -902,7 +946,7 @@ export default {
                   }
                   // alert(11)
                   messages[i].IMGURLNOW = this.imgulrNow;
-                  console.log(messages[i])
+                  console.log(messages[i]);
                   this.mesageList.push(messages[i]);
                 } else {
                   // alert(22)
@@ -1531,7 +1575,7 @@ export default {
       if (this.chat_textarea == "") {
         return false;
       }
-      
+
       this.isSengContent = true;
       sendMessageContent.minIdData = this.$store.getters.messageData.id;
       this.mesageList.push(sendMessageContent);
@@ -1546,9 +1590,9 @@ export default {
         successCallback: () => {
           this.tenData = false;
           // this.mesageList.push(sendMessageContent);
-          console.log(this.mesageList.length)
-          console.log(this.mesageList[this.mesageList.length-1].sendStatus)
-          this.mesageList[this.mesageList.length-1].sendStatus = 1
+          console.log(this.mesageList.length);
+          console.log(this.mesageList[this.mesageList.length - 1].sendStatus);
+          this.mesageList[this.mesageList.length - 1].sendStatus = 1;
           this.bottomshow();
           this.chat_textarea = "";
           this.isSengContent = false;
@@ -1557,9 +1601,9 @@ export default {
           this.tenData = false;
           // sendMessageContent.minIdData = this.$store.getters.messageData.id;
           // sendMessageContent.sendStatus = "-1";
-          this.mesageList[this.mesageList.length-1].sendStatus = "-1"
+          this.mesageList[this.mesageList.length - 1].sendStatus = "-1";
           // this.mesageList.push(sendMessageContent);
-          console.log(this.mesageList.length)
+          console.log(this.mesageList.length);
           this.bottomshow();
           this.chat_textarea = "";
           this.isSengContent = false;
@@ -1726,7 +1770,7 @@ export default {
     },
     //音乐播放
     audioPlay() {
-     // alert(this.$refs.palyMuisc);
+      // alert(this.$refs.palyMuisc);
       this.isPlayiing = true;
       // this.$refs.palyMuisc.palyMuisc
     },
@@ -1743,7 +1787,7 @@ export default {
 </script>
 
 <style lang="scss">
-.big_img_style{
+.big_img_style {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.86);
@@ -1753,7 +1797,7 @@ export default {
   z-index: 99;
   text-align: center;
   padding: 50px 20px 20px;
-  img{
+  img {
     max-width: 100%;
     max-height: 100%;
   }
@@ -1906,6 +1950,7 @@ export default {
             img {
               width: 56px;
               height: 56px;
+              cursor: pointer;
             }
           }
         }
@@ -2042,7 +2087,7 @@ export default {
                     border-radius: 30px;
                     cursor: pointer;
                   }
-                  img{
+                  img {
                     width: 30px;
                     height: 30px;
                     animation: loadingAni 1s linear;
@@ -2195,10 +2240,11 @@ export default {
   }
 }
 @keyframes loadingAni {
-  0%,100%{
+  0%,
+  100% {
     transform: scaleZ(0deg);
   }
-  50%{
+  50% {
     transform: scaleZ(360deg);
   }
 }

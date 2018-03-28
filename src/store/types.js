@@ -22,4 +22,5 @@ export const RETURNDX = 'RETURNDX'//离线消息
 export const GET_MORE_MESS = 'GET_MORE_MESS'//滚动消息刷新
 export const UPDATACHATSTATUS = 'UPDATACHATSTATUS'//滚动消息刷新updateChatStatus
 export const PISDEFAULT = 'PISDEFAULT'//滚动消息刷新updateChatStatus
-export const TSRUNBIND = 'TSRUNBIND'//解绑工号
+export const TSRUNBIND = 'TSRUNBIND'//解绑工号 getTSRhead
+export const GETTSRHEAD = 'GETTSRHEAD'//更新头像 getTSRhead

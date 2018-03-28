@@ -206,6 +206,31 @@ const actions = {
             }
         })
     },
+    // 头像更新方法
+    [types.GETTSRHEAD]({ commit }, { getTsrHeadData, successCallback = () => { }, failCallback = () => { } }) {
+        axios({
+            method: 'post',
+            url: '/tpdwt_web/getTSRhead.html',
+            data: getTsrHeadData,
+            "Content-Type": "multipart/form-data"
+        }).then((res) => {
+            var result = res.data
+            console.log(result)
+            if (result.responseCode == 0) {
+                // state.getMoreMessage = result.result
+                successCallback()
+            } else {
+                failCallback()
+            }
+
+        }).catch(function (err) {
+            failCallback()
+            let res = err.response
+            if (err) {
+                console.log('头像更新失败 ' + res)
+            }
+        })
+    },
 
 }
 
