@@ -14,6 +14,7 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import store from './store'
 import utils from '../static/js/utils'
+import html2canvas from 'html2canvas'
 
 
 Vue.prototype.$utils = utils

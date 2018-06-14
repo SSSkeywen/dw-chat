@@ -27,7 +27,7 @@ const actions = {
             "Content-Type": "multipart/form-data"
         }).then((res) => {
             var result = res.data
-            console.log(result)
+            // console.log(result)
             if (result.responseCode == 0) {
                 state.cardData = result.result
                 successCallback()
@@ -52,7 +52,7 @@ const actions = {
             "Content-Type": "multipart/form-data"
         }).then((res) => {
             var result = res.data
-            console.log(result)
+            // console.log(result)
             if (result.responseCode == 0) {
                 // state.cardData = result.result
                 // successCallback()
@@ -345,6 +345,7 @@ const actions = {
             "Content-Type": "multipart/form-data"
         }).then((res) => {
             var result = res.data
+            console.log(result)
             if (result.responseCode == 0) {
                 state.messageNoDataList = result.result
                 successCallback()

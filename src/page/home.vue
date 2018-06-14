@@ -37,7 +37,7 @@
               <div class="portrait_img">
                 <div  v-if="item.NICKNAME == '我自己'">
                   <img src="../../static/images/headPortrait.jpg" alt="" v-if="isMeImgPt">
-                  <img :src="'/tpdwt_web/chat/getFile.html?filePath='+item.HEADERIMG" alt="" v-else>  
+                  <img :src="'/tpdwt_web/chat/getFile.html?a='+Math.random()+'&filePath='+item.HEADERIMG" alt="" v-else>  
                 </div>
                 <div v-else>
                   <img :src="'/tpdwt_web/chat/getFile.html?filePath='+item.HEADERIMG" alt="">
@@ -64,6 +64,10 @@
           <div class="chat_message_left">
             <el-button @click="isChatList"><span class="chat_list_left" v-if="isChatListleft">&gt;&gt;</span><span class="chat_list_left" v-else>&lt;&lt;</span> 客户列表</el-button>
           </div>
+          
+          <!-- <a href="" class="chat_message_left clickMessage" style="width:130px!important;" download="imgload">
+            消息列表导出
+          </a> -->
           <div class="chat_message_rihgt">
             <!-- / <p @click="bindingOperation">{{ tsrnoBadingData}}</p> -->
             <p @click="bindingOperationOne"> {{ tsrnoBadingData}}</p>
@@ -72,7 +76,7 @@
              
             <div @click="newPoto">
               <img src="../../static/images/headPortrait.jpg" alt="" v-if="isMeImgPt">
-              <img :src="'/tpdwt_web/chat/getFile.html?filePath='+accessphotourl" alt="" v-else>
+              <img :src="'/tpdwt_web/chat/getFile.html?a='+Math.random()+'&filePath='+accessphotourl" alt="" v-else>
             </div>
             <p @click="cardRedact()">编辑名片>></p>
           </div>
@@ -82,14 +86,22 @@
         <div class="chat_interface">
           <div>
             <div class="chat_window_title">
-              <p class="chat_window_name">{{ clientNameNow }}</p>
+              <p class="chat_window_name" style="width:65%">{{ clientNameNow }}</p>
+              <div style="width: 18%;" class="download-icon">
+            <div class="clickMessage" style="display:flex;" @click="clickPtTwo">
+              <div style="padding-top:3px;padding-right: 3px;">
+                <img :src="downLoadIcon" width="25px" height="26px">
+              </div>
+              <span style="display:block;line-height:33px;">导出记录</span>
+            </div>
+          </div>
               <div class="chat_window_close">
                 <div><img src="../../static/images/close_icon.png" alt=""></div>
                 <p @click="closeConversation()">结束会话</p>
               </div>
             </div>
             <div class="chat_message_list" ref="chat_window_box" @scroll="getMore">
-              <ul ref="chat_window_down">
+              <ul ref="chat_window_down" class="listpt">
                 <li v-for="(item, index) in mesageList" :key="index">
                   <div class="chat_message_text" v-if="!item.isMe">
                     <p class="chai_time">{{ item.CreateTime }}</p>
@@ -110,7 +122,7 @@
                           <img v-if="item.MsgType=='2'" :src="'/tpdwt_web/chat/getFile.html?filePath='+item.localPicUrl" alt="" @click="imgbig(item.localPicUrl)">
                           <div v-else-if="item.MsgType=='5'">
                             <!-- <span>yinyue</span> -->
-                            <audio :src="item.localPicUrl" :autoplay="isPlayiing" ref="palyMuisc" controls  class="audio_music">
+                            <audio :src="'/tpdwt_web/chat/getFile.html?filePath='+item.localPicUrl" :autoplay="isPlayiing" ref="palyMuisc" controls  class="audio_music">
                             </audio>
                           </div>
                           <span v-else>{{ item.Content }}</span>
@@ -203,7 +215,20 @@
           </div>
         </div>
         <div class="chat_message">
-          <Personal @clientFooterDataL="clientFooterDataL" @clientPortrayalData="clientPortrayalData" :isPhoneDisabel="isPhoneDisabel" :isDisabel="isDisabel" @sendNoteData="sendNoteData" @sendWechatData="sendWechatData" @openContent="openContentC" @openContentNote="openContentNote" :clientPortrayalDataList="clientPortrayalDataList" :clientFooterData="clientFooterData" :isJudge="isJudge" ref="personalOn" :clientPortrayalNo="clientPortrayalNo"></Personal> 
+          <Personal 
+          @clientFooterDataL="clientFooterDataL" 
+          @clientPortrayalData="clientPortrayalData" 
+          :isPhoneDisabel="isPhoneDisabel" 
+          :isDisabel="isDisabel" 
+          @sendNoteData="sendNoteData" 
+          @sendWechatData="sendWechatData" 
+          @openContent="openContentC" 
+          @openContentNote="openContentNote" 
+          :clientPortrayalDataList="clientPortrayalDataList" 
+          :clientFooterData="clientFooterData" 
+          :isJudge="isJudge" 
+          ref="personalOn" 
+          :clientPortrayalNo="clientPortrayalNo"></Personal> 
         </div>
       </div>
     </div>
@@ -223,6 +248,7 @@
 import promise from "es6-promise";
 promise.polyfill();
 import axios from "axios";
+import html2canvas from 'html2canvas'
 import Personal from "../components/personalInformation";
 import MyCard from "../components/myCard";
 import Preview from "../components/preview";
@@ -241,9 +267,11 @@ export default {
   },
   data() {
     return {
+      downLoadIcon: require('../../static/images/downLoadIcon.png'),
       isbigImg: false, //图片放大蒙版是否显示
       bigImgData: "", //大图路径
       isMeImgPt: "",
+      clickMessageData: '111',
       tenData: "",
       contentText: false,
       getmessagelist: "",
@@ -331,6 +359,7 @@ export default {
     this.bottomshow();
     this.judge();
     this.selsectWindow();
+    // this.clickPt()
   },
   methods: {
     ...mapActions({
@@ -355,19 +384,65 @@ export default {
       getMoreMess: types.GET_MORE_MESS,
       upSataStatus: types.UPDATACHATSTATUS,
       getTsrHeadFn: types.GETTSRHEAD,
+      getvicerecord: types.VOICERECORD,
     }),
+    //点击生成图片的方法
+    clickPtTwo(){
+      let userTsrL = JSON.parse(window.localStorage.getItem("userTsr"));
+      let ptData = new FormData();
+      console.log(this.nowOpenIdData)
+      ptData.append("tsrno", userTsrL.TSR_SESSION.tsrno);
+      ptData.append("openId", this.nowOpenIdData);
+      this.getvicerecord({
+        ptData,
+        successCallback: (result) => {
+          console.log("start poto");
+          // result = '/tpdwt_web/tm/getFile.html?filePath=' + result
+          window.open(result);
+        },
+        failCallback: () => {}
+      });
+    },
+    clickPt(){
+      //创建一个新的canvas
+        let canvas2 = document.createElement("canvas");
+        let _canvas = document.querySelector('div');
+        let w = parseInt(window.getComputedStyle(_canvas).width);
+        let h = parseInt(window.getComputedStyle(_canvas).height);
+        //将canvas画布放大若干倍，然后盛放在较小的容器内，就显得不模糊了
+        canvas2.width = w * 2;
+        canvas2.height = h * 2;
+        canvas2.style.width = w + "px";
+        canvas2.style.height = h + "px";
+        //可以按照自己的需求，对context的参数修改,translate指的是偏移量
+        //  var context = canvas.getContext("2d");
+        //  context.translate(0,0);
+        let context = canvas2.getContext("2d");
+        context.scale(2, 2);
+        html2canvas(document.querySelector(".listpt"), { canvas: canvas2 }).then(function (canvas) {
+            document.body.appendChild(canvas);
+            //canvas转换成url，然后利用a标签的download属性，直接下载，绕过上传服务器再下载
+            // this.$refs.clickMessage.setAttribute('href', canvas.toDataURL());
+            // console.log(this.clickMessageData)
+            // this.clickMessageData = canvas.toDataURL()
+            console.log(canvas.toDataURL())
+            document.querySelector(".clickMessage").setAttribute('href', canvas.toDataURL());
+        });
+        canvas2.style.display = 'none'
+    },
     //点击更新头像的方法
-    newPoto(){
+    newPoto() {
       let userTsrL = JSON.parse(window.localStorage.getItem("userTsr"));
       let getTsrHeadData = new FormData();
       getTsrHeadData.append("tsrno", userTsrL.TSR_SESSION.tsrno);
       this.getTsrHeadFn({
         getTsrHeadData,
         successCallback: () => {
-          location.reload()
+          console.log("刷新");
+          window.location.reload();
         },
         failCallback: () => {}
-      })
+      });
     },
     //切换页面函数
     selsectWindow() {
@@ -389,7 +464,7 @@ export default {
       };
       window.onfocus = () => {
         console.log("进入页面");
-        console.log(newMun);
+        // console.log(newMun);
         this.selectChat(newMun);
       };
       // window.onfocus = function() {
@@ -609,6 +684,8 @@ export default {
       if (
         userTsrL.TSR_SESSION.tsrposition == "TSR" ||
         userTsrL.TSR_SESSION.tsrposition == "CSR" ||
+        userTsrL.TSR_SESSION.tsrposition == "HQL" ||
+        userTsrL.TSR_SESSION.tsrposition == "QL" ||
         userTsrL.TSR_SESSION.tsrposition == "CSL"
       ) {
         this.isDisabelStar = false;
@@ -626,6 +703,13 @@ export default {
         this.isDisabelStar = false;
       } else {
         this.isJudge = false;
+      }
+      if (
+        userTsrL.TSR_SESSION.tsrposition == "HQL" ||
+        userTsrL.TSR_SESSION.tsrposition == "QL"
+      ) {
+        this.isDisabelStar = true;
+        this.isDisabel = true;
       }
     },
     //开始会话
@@ -760,6 +844,8 @@ export default {
         this.clientListData[index].OPENID != undefined &&
         this.clientListData[index].OPENID != null &&
         (userTsrL.TSR_SESSION.tsrposition == "TSR" ||
+          userTsrL.TSR_SESSION.tsrposition == "HQL" ||
+          userTsrL.TSR_SESSION.tsrposition == "QL" ||
           userTsrL.TSR_SESSION.tsrposition == "CSR")
       ) {
         // console.log(this.clientListData[index])
@@ -782,6 +868,8 @@ export default {
           (userTsrL.TSR_SESSION.tsrposition == "TSR" ||
             userTsrL.TSR_SESSION.tsrposition == "CSR" ||
             userTsrL.TSR_SESSION.tsrposition == "TL" ||
+            userTsrL.TSR_SESSION.tsrposition == "HQL" ||
+            userTsrL.TSR_SESSION.tsrposition == "QL" ||
             userTsrL.TSR_SESSION.tsrposition == "UM")
         ) {
           // console.log(this.clientListData[index])
@@ -794,6 +882,7 @@ export default {
           this.previewDisabel = true;
         }
       }
+
       if (
         this.clientListData[index].PHONENO != "" &&
         this.clientListData[index].PHONENO != undefined &&
@@ -844,6 +933,30 @@ export default {
         // this.isDisabel = true
         // this.previewDisabel = true
         // this.$refs.personalOn.perSelectTwo(true, true)
+      }
+      if (
+        userTsrL.TSR_SESSION.tsrposition == "HQL" ||
+        userTsrL.TSR_SESSION.tsrposition == "QL"
+      ) {
+        this.isPhoneDisabel = true;
+        this.isDisabel = true;
+      }
+      if (
+        this.clientListData[index].PHONENO != "" &&
+        this.clientListData[index].PHONENO != undefined &&
+        this.clientListData[index].PHONENO != null &&
+        (userTsrL.TSR_SESSION.tsrposition == "HQL" ||
+          userTsrL.TSR_SESSION.tsrposition == "QL")
+      ) {
+        // console.log(this.clientListDa   a[index].PHONENO)
+        // this.$refs.personalOn.perSelectTwo(false, false)
+        this.isDisabelStar = false;
+      }else if(
+        index != "0"&&
+        (userTsrL.TSR_SESSION.tsrposition == "HQL" ||
+          userTsrL.TSR_SESSION.tsrposition == "QL")
+      ){
+        this.isDisabelStar = true;
       }
       //发送按钮解冻
       this.isSengContent = false;
@@ -904,6 +1017,7 @@ export default {
       // this.clientPortrayalData ()
       // this.clientFooterDataL()
       this.$refs.personalOn.titleOPeration(0);
+      // this.clickPt()  //导出图片函数
       // this.$refs.personalOn.clientFooterList()
     },
     get_message_reply(url, reciver_uid, sender_uid) {
@@ -1296,6 +1410,7 @@ export default {
         successCallback: () => {
           this.PreviewTitleName = "微信预览";
           this.PreviewData = this.$store.getters.WechatPreviewData;
+          console.log(this.PreviewData);
         },
         failCallback: () => {}
       });
@@ -1315,7 +1430,7 @@ export default {
         showtmData,
         successCallback: () => {
           this.PreviewTitleName = "短信预览";
-          // console.log(this.$store.getters.WechatPreviewData)
+          console.log(this.$store.getters.WechatPreviewData);
           this.PreviewData = this.$store.getters.WechatPreviewData;
         },
         failCallback: () => {}
@@ -1367,7 +1482,7 @@ export default {
           sendMessageContent.MsgType = "3";
           sendMessageContent.sendStatus = "1";
           sendMessageContent.imgurl = this.PreviewData.accessimgurl;
-          sendMessageContent.mainTitle = this.PreviewData.mainTitle;
+          sendMessageContent.mainTitle = this.PreviewData.slug;
           sendMessageContent.subTitle = this.PreviewData.subTitle;
           sendMessageContent.moduleName = this.PreviewData.moduleName;
           // console.log(sendMessageContent)
@@ -1392,7 +1507,7 @@ export default {
           sendMessageContent.MsgType = "3";
           sendMessageContent.sendStatus = "-1";
           sendMessageContent.imgurl = this.PreviewData.accessimgurl;
-          sendMessageContent.mainTitle = this.PreviewData.mainTitle;
+          sendMessageContent.mainTitle = this.PreviewData.slug;
           sendMessageContent.subTitle = this.PreviewData.subTitle;
           sendMessageContent.moduleName = this.PreviewData.moduleName;
           this.mesageList.push(sendMessageContent);
@@ -1489,7 +1604,7 @@ export default {
           this.messageTypeData = "news";
         },
         failCallback: () => {
-          this.$message.error("短信发送失败！");
+          // this.$message.error("短信发送失败！");
           // this.tenData = false
           let sendMessageContent = {};
           sendMessageContent.minIdData = midIdData;
@@ -1740,6 +1855,7 @@ export default {
             if (this.$store.getters.getMoreMessage.length > 8) {
               console.log(this.$store.getters.getMoreMessage.length);
               this.$refs.chat_window_box.scrollTop = 900;
+              // this.clickPt()
             }
           },
           failCallback: () => {}
@@ -1926,7 +2042,7 @@ export default {
         .chat_message_left {
           padding-top: 10px;
           width: 70%;
-          min-width: 660px;
+          // min-width: 660px;
           .chat_list_left {
             display: inline-block;
             transform: scaleY(1.2);
@@ -2239,6 +2355,10 @@ export default {
     font-size: 14px;
   }
 }
+.clickMessage{
+  display: flex;
+}
+
 @keyframes loadingAni {
   0%,
   100% {
@@ -2247,6 +2367,9 @@ export default {
   50% {
     transform: scaleZ(360deg);
   }
+}
+.download-icon:hover{
+      cursor: pointer;
 }
 </style>
 

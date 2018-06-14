@@ -24,3 +24,4 @@ export const UPDATACHATSTATUS = 'UPDATACHATSTATUS'//滚动消息刷新updateChat
 export const PISDEFAULT = 'PISDEFAULT'//滚动消息刷新updateChatStatus
 export const TSRUNBIND = 'TSRUNBIND'//解绑工号 getTSRhead
 export const GETTSRHEAD = 'GETTSRHEAD'//更新头像 getTSRhead
+export const VOICERECORD = 'VOICERECORD'//生成图片方法名 getVoiceRecord

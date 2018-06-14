@@ -83,7 +83,7 @@ const actions = {
             "Content-Type": "multipart/form-data"
         }).then((res) => {
             var result = res.data
-            console.log(result)
+            // console.log(result)
             if (result.responseCode == 0) {
                 state.chatRecordList = result.result
                 successCallback()
@@ -231,6 +231,31 @@ const actions = {
             }
         })
     },
+    // 生成图片方法
+    [types.VOICERECORD]({ commit }, { ptData, successCallback = () => { }, failCallback = () => { } }) {
+        axios({
+            method: 'post',
+            url: '/tpdwt_web/getVoiceRecord.html',
+            data: ptData,
+            "Content-Type": "multipart/form-data"
+        }).then((res) => {
+            var result = res.data
+            console.log(result)
+            if (result.responseCode == 0) {
+                successCallback(result.result)
+            } else {
+                failCallback()
+            }
+
+        }).catch(function (err) {
+            failCallback()
+            let res = err.response
+            if (err) {
+                console.log('生成图片方法 ' + res)
+            }
+        })
+    },
+
 
 }
 

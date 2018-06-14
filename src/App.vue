@@ -139,22 +139,22 @@ margin: 0;
 }
 	::-webkit-input-placeholder {
 		/* WebKit browsers */
-		color: #bfcbd9 !important;
+		color: #CACACA !important;
 	}
 	
 	 :-moz-placeholder {
 		/* Mozilla Firefox 4 to 18 */
-		color: #bfcbd9 !important;
+		color: #CACACA !important;
 	}
 	
 	 ::-moz-placeholder {
 		/* Mozilla Firefox 19+ */
-		color: #bfcbd9 !important;
+		color: #CACACA !important;
 	}
 	
 	 :-ms-input-placeholder {
 		/* Internet Explorer 10+ */
-		color: #bfcbd9 !important;
+		color: #CACACA !important;
 	}
 	.el-textarea {
     display: inline-block;

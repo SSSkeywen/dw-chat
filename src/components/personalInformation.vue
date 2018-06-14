@@ -37,7 +37,7 @@
                                 <div class="card_checkbox">
                                     <el-checkbox v-model="cardListData.isCardSelect"></el-checkbox>
                                 </div>
-                                <p>{{ cardListData.MAINTITLE}}</p>
+                                <p>{{ cardListData.SLUG}}</p>
                                 
                             </li>
                         </ul>
@@ -192,7 +192,7 @@ export default {
               selectableIcon:'icon-shouyefill',
               temlist:[{
                     ID:"46546546",
-                    MAINTITLE:"测试使用1",
+                    SLUG:"测试使用1",
                     MODULEID:"1",
                     TYPE:"2",
               }]
@@ -203,7 +203,7 @@ export default {
               pitchOn: "",
               temlist:[{
                     ID:"46546546",
-                    MAINTITLE:"测试使用1",
+                    SLUG:"测试使用1",
                     MODULEID:"1",
                     TYPE:"2",
               }]
@@ -214,7 +214,7 @@ export default {
               pitchOn: "",
               temlist:[{
                     ID:"46546546",
-                    MAINTITLE:"测试使用1",
+                    SLUG:"测试使用1",
                     MODULEID:"1",
                     TYPE:"2",
               }]
@@ -225,7 +225,7 @@ export default {
               pitchOn: "",
               temlist:[{
                     ID:"46546546",
-                    MAINTITLE:"测试使用1",
+                    SLUG:"测试使用1",
                     MODULEID:"1",
                     TYPE:"2",
               }]
@@ -236,7 +236,7 @@ export default {
               pitchOn: "",
               temlist:[{
                     ID:"46546546",
-                    MAINTITLE:"测试使用1",
+                    SLUG:"测试使用1",
                     MODULEID:"1",
                     TYPE:"2",
               }]
@@ -288,7 +288,7 @@ export default {
                 for(let i = 0; i <  this.$store.getters.cardListData.length;i ++ ){
                     this.selectableListData[i].temlist = this.$store.getters.cardListData[i].temlist
                     }
-                
+                console.log(this.selectableListData)
                 },
                 failCallback: () => {
                 }

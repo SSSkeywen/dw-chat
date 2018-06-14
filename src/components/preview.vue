@@ -29,7 +29,7 @@
               <hgroup>{{ PreviewData.moduleName }}</hgroup>
               <div class="preview_data">
                   <p class="preview_data_title">
-                      <span>{{ PreviewData.mainTitle }}</span>
+                      <span>{{ PreviewData.slug }}</span>
                   </p>
                   <div class="preview_data_introduce">
                       <p>

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "element-ui": "^2.0.5",
+    "html2canvas": "^1.0.0-alpha.12",
     "qrcode": "^1.0.0",
     "vue": "^2.5.2",
     "vue-chat-scroll": "^1.2.1",
