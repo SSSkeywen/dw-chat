@@ -44,7 +44,7 @@
          </div>
 
           <div class="preview_send">
-            <el-button type="primary" @click="sendContent" :disabled="previewDisabel">发送</el-button>
+            <el-button type="primary" @click="sendContent">发送</el-button>
             <el-button type="info" @click="close_icon">取消</el-button>
         </div>
         <div class="close_icon">
@@ -62,7 +62,7 @@ export default {
           isSms: true,
       }
   },
-  props: ['PreviewData','PreviewTitleName','previewDisabel'],
+  props: ['PreviewData','PreviewTitleName'],
   methods: {
       close_icon() {
           this.$emit('fetch')
@@ -71,7 +71,7 @@ export default {
           if (this.PreviewTitleName == '微信预览'){
               this.$emit('sendWechatData')
           }else{
-              this.$emit('sendNoteData')
+              this.$emit('sendNoteData2')
           }
           this.$emit('fetch')
       },

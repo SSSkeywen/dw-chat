@@ -122,7 +122,7 @@
                           <img v-if="item.MsgType=='2'" :src="'/tpdwt_web/chat/getFile.html?filePath='+item.localPicUrl" alt="" @click="imgbig(item.localPicUrl)">
                           <div v-else-if="item.MsgType=='5'">
                             <!-- <span>yinyue</span> -->
-                            <audio :src="'/tpdwt_web/chat/getFile.html?filePath='+item.localPicUrl" :autoplay="isPlayiing" ref="palyMuisc" controls  class="audio_music">
+                            <audio :src="item.localPicUrl" :autoplay="isPlayiing" ref="palyMuisc" controls  class="audio_music">
                             </audio>
                           </div>
                           <span v-else>{{ item.Content }}</span>
@@ -159,7 +159,8 @@
                                   <p>{{ item.subTitle }}</p>
                                 </div>
                               </div>
-                              <div class="myCardStyleDwon">{{ item.moduleName }}</div>
+                              <div class="myCardStyleDwon">{{ item.moduleName }} <span style="float:right;" v-if="!(item.imgurl!='null'&&item.imgurl!=''&&item.imgurl!='undefined'&&item.imgurl)">{{ item.ToPhone | filterphone }}</span></div>
+                              
                             </div>
                           </div>
                           <!-- <div v-else-if="item.MsgType=='1'">
@@ -236,8 +237,35 @@
       <img :src="bigImgData" alt="">
     </div>
     <div class="supernatant_bg" v-if="idSupernatant">
+      <!-- 输入手机号码-star -->
+      <div class="input-phone" v-if="isShowInputPhone">
+        <div class="new-close-style" @click="closeOperation">
+          <img :src="newCloseIcon" width="100%">
+        </div>
+        <div class="new-tips-style">
+          <img :src="newTipsIcon" width="100%">
+        </div>
+        <p class="new-tips-content">{{ phoneTitle }}</p>
+        <div class="new-input-phone" v-if="hasPhoneNo">
+          <el-input v-model="newInpurPhone" placeholder="请输入用户手机号"></el-input>
+        </div>
+        <div class="new-input-phone" v-else>
+          <ul class="new-phone-list">
+            <li v-for="(item,index) in phoneListData" :key="index" @click="selectPhoneNoFn(index)">
+              <div class="new-phone-select">
+                <p v-if="item.isSelectNowPhoneNo" class="new-phone-icon"></p>
+              </div>
+              <p class="new-phone-number">{{ item.phoneNewData | filterphone }}</p>
+            </li>
+          </ul>
+        </div>
+        <div class="new-input-btn">
+          <el-button type="primary" @click="newInputFn">发送</el-button>
+        </div>
+      </div>
+      <!-- 输入手机号码-end -->
       <MyCard v-if="isMyCard" @fetch="closeOperation" :cardDataList="cardDataList"></MyCard>
-      <Preview v-if="isPreview" @fetch="closeOperation" @sendNoteData="sendNoteData" @sendWechatData="sendWechatData" :PreviewData="PreviewData" :PreviewTitleName="PreviewTitleName" :previewDisabel="previewDisabel"></Preview>
+      <Preview v-if="isPreview" @fetch="closeOperation" @sendNoteData2="sendNoteData2" @sendWechatData="sendWechatData" :PreviewData="PreviewData" :PreviewTitleName="PreviewTitleName" :previewDisabel="previewDisabel"></Preview>
       <Binding v-if="isBinding" @fetch="closeOperation" :qrcodeLogionData="qrcodeLogionData" @baindingOver="baindingOver" ref="bindingFn"></Binding>
       <comeToNothing v-if="isComeToNothing" @fetch="closeOperation" @nothingFn="nothingFn" :comeToNothingData="comeToNothingData"></comeToNothing>
     </div>
@@ -248,12 +276,13 @@
 import promise from "es6-promise";
 promise.polyfill();
 import axios from "axios";
-import html2canvas from 'html2canvas'
+import html2canvas from "html2canvas";
 import Personal from "../components/personalInformation";
 import MyCard from "../components/myCard";
 import Preview from "../components/preview";
 import Binding from "../components/binding";
 import comeToNothing from "../components/comeToNothing";
+import { toPhone } from "@/filter/filterphone.js";
 import * as types from "../store/types.js";
 import { mapActions } from "vuex";
 
@@ -265,13 +294,21 @@ export default {
     Binding,
     comeToNothing
   },
-  data() {
+  data: function() {
     return {
-      downLoadIcon: require('../../static/images/downLoadIcon.png'),
+      hasPhoneNo: false,
+      nowPhoneNoTwo: "",
+      downLoadIcon: require("../../static/images/downLoadIcon.png"),
+      newCloseIcon: require("../../static/images/newCloseIcon.png"),
+      newTipsIcon: require("../../static/images/newTipsIcon.png"),
+      phoneTitle: "系统中没有用户手机号，请输入后发送",
+      newInpurPhone: "",
+      isShowInputPhone: false, //是否显示手机号码输入
       isbigImg: false, //图片放大蒙版是否显示
       bigImgData: "", //大图路径
+      ylorsend: '',
       isMeImgPt: "",
-      clickMessageData: '111',
+      clickMessageData: "111",
       tenData: "",
       contentText: false,
       getmessagelist: "",
@@ -296,6 +333,8 @@ export default {
       previewDisabel: false,
       nowOpenIdData: "", //当前OPenId
       nowPhoneNo: "", //当前手机号码
+      sendNowPhoneNo: "", //发送手机号码
+      phoneListData: [], //获取到的手机号码列表
       NotePreviewData: "",
       WechatPreviewData: "",
       PreviewData: "",
@@ -347,6 +386,11 @@ export default {
       ]
     };
   },
+  filters: {
+    filterphone(phoneNo) {
+      return toPhone(phoneNo);
+    }
+  },
   created() {
     this.starNum = this.$utils.getUrlKey("content");
     // console.log(this.starNum)
@@ -385,50 +429,52 @@ export default {
       upSataStatus: types.UPDATACHATSTATUS,
       getTsrHeadFn: types.GETTSRHEAD,
       getvicerecord: types.VOICERECORD,
+      getClientPhoneNoFn: types.GETCLIENTPHONENO
     }),
     //点击生成图片的方法
-    clickPtTwo(){
+    clickPtTwo() {
       let userTsrL = JSON.parse(window.localStorage.getItem("userTsr"));
       let ptData = new FormData();
-      console.log(this.nowOpenIdData)
       ptData.append("tsrno", userTsrL.TSR_SESSION.tsrno);
       ptData.append("openId", this.nowOpenIdData);
       this.getvicerecord({
         ptData,
-        successCallback: (result) => {
-          console.log("start poto");
-          // result = '/tpdwt_web/tm/getFile.html?filePath=' + result
+        successCallback: result => {
           window.open(result);
         },
         failCallback: () => {}
       });
     },
-    clickPt(){
+    clickPt() {
       //创建一个新的canvas
-        let canvas2 = document.createElement("canvas");
-        let _canvas = document.querySelector('div');
-        let w = parseInt(window.getComputedStyle(_canvas).width);
-        let h = parseInt(window.getComputedStyle(_canvas).height);
-        //将canvas画布放大若干倍，然后盛放在较小的容器内，就显得不模糊了
-        canvas2.width = w * 2;
-        canvas2.height = h * 2;
-        canvas2.style.width = w + "px";
-        canvas2.style.height = h + "px";
-        //可以按照自己的需求，对context的参数修改,translate指的是偏移量
-        //  var context = canvas.getContext("2d");
-        //  context.translate(0,0);
-        let context = canvas2.getContext("2d");
-        context.scale(2, 2);
-        html2canvas(document.querySelector(".listpt"), { canvas: canvas2 }).then(function (canvas) {
-            document.body.appendChild(canvas);
-            //canvas转换成url，然后利用a标签的download属性，直接下载，绕过上传服务器再下载
-            // this.$refs.clickMessage.setAttribute('href', canvas.toDataURL());
-            // console.log(this.clickMessageData)
-            // this.clickMessageData = canvas.toDataURL()
-            console.log(canvas.toDataURL())
-            document.querySelector(".clickMessage").setAttribute('href', canvas.toDataURL());
-        });
-        canvas2.style.display = 'none'
+      let canvas2 = document.createElement("canvas");
+      let _canvas = document.querySelector("div");
+      let w = parseInt(window.getComputedStyle(_canvas).width);
+      let h = parseInt(window.getComputedStyle(_canvas).height);
+      //将canvas画布放大若干倍，然后盛放在较小的容器内，就显得不模糊了
+      canvas2.width = w * 2;
+      canvas2.height = h * 2;
+      canvas2.style.width = w + "px";
+      canvas2.style.height = h + "px";
+      //可以按照自己的需求，对context的参数修改,translate指的是偏移量
+      //  var context = canvas.getContext("2d");
+      //  context.translate(0,0);
+      let context = canvas2.getContext("2d");
+      context.scale(2, 2);
+      html2canvas(document.querySelector(".listpt"), { canvas: canvas2 }).then(
+        function(canvas) {
+          document.body.appendChild(canvas);
+          //canvas转换成url，然后利用a标签的download属性，直接下载，绕过上传服务器再下载
+          // this.$refs.clickMessage.setAttribute('href', canvas.toDataURL());
+          // console.log(this.clickMessageData)
+          // this.clickMessageData = canvas.toDataURL()
+          console.log(canvas.toDataURL());
+          document
+            .querySelector(".clickMessage")
+            .setAttribute("href", canvas.toDataURL());
+        }
+      );
+      canvas2.style.display = "none";
     },
     //点击更新头像的方法
     newPoto() {
@@ -951,11 +997,11 @@ export default {
         // console.log(this.clientListDa   a[index].PHONENO)
         // this.$refs.personalOn.perSelectTwo(false, false)
         this.isDisabelStar = false;
-      }else if(
-        index != "0"&&
+      } else if (
+        index != "0" &&
         (userTsrL.TSR_SESSION.tsrposition == "HQL" ||
           userTsrL.TSR_SESSION.tsrposition == "QL")
-      ){
+      ) {
         this.isDisabelStar = true;
       }
       //发送按钮解冻
@@ -1002,6 +1048,22 @@ export default {
               ) {
                 this.mesageList[i].isMe = true;
               }
+              // console.log(this.mesageList[i].toPhone)
+              if (
+                this.mesageList[i].ToPhone != "" &&
+                this.mesageList[i].ToPhone != undefined &&
+                this.mesageList[i].ToPhone != null
+              ) {
+                this.mesageList[i].isMe = true;
+              }
+              
+              // if (
+              //   this.mesageList[i].mainTitle != "" &&
+              //   this.mesageList[i].mainTitle != undefined &&
+              //   this.mesageList[i].mainTitle != null
+              // ) {
+              //   this.mesageList[i].isMe = true;
+              // }
             }
           }
 
@@ -1395,6 +1457,7 @@ export default {
     //     }
     //   })
     // },
+
     //显示预览
     openContentC(listNoThree) {
       // console.log(listNoThree)
@@ -1417,8 +1480,131 @@ export default {
       this.idSupernatant = true;
       this.isPreview = true;
     },
-    //短信显示预览
+    //获取手机号码方法
+    getPhoenNoFn() {
+      let getPhoneNoData = new FormData();
+      getPhoneNoData.append("phone", this.nowPhoneNo);
+      this.getClientPhoneNoFn({
+        getPhoneNoData,
+        successCallback: result => {
+          // if(result.length != '0'){
+            this.phoneListData.length = 0;
+            for (let item of result) {
+              let phoneDataJson = {
+                phoneNewData: item,
+                isSelectNowPhoneNo: false
+              };
+              this.phoneListData.push(phoneDataJson);
+            }
+            this.phoneListData[0].isSelectNowPhoneNo = true;
+            this.sendNowPhoneNo = this.phoneListData[0].phoneNewData;
+          // }
+          
+          console.log(this.phoneListData);
+        },
+        failCallback: () => {}
+      });
+    },
+    //选择发送的手机号码
+    selectPhoneNoFn(index) {
+      console.log(index);
+      for (let item of this.phoneListData) {
+        item.isSelectNowPhoneNo = false;
+      }
+      this.phoneListData[index].isSelectNowPhoneNo = true;
+      this.sendNowPhoneNo = this.phoneListData[index].phoneNewData;
+      // this.newInputFn()
+    },
+    //弹出输入手机号码
+    iputPhoneNo() {
+      this.newInpurPhone = "";
+      this.idSupernatant = true;
+      this.isShowInputPhone = true;
+    },
     openContentNote(listNoThree) {
+      this.ylorsend = '2'
+      this.NotePreviewData = listNoThree;
+      console.log(this.nowPhoneNo);
+      if (
+        this.nowPhoneNo != "" &&
+        this.nowPhoneNo != undefined &&
+        this.nowPhoneNo != null
+      ) {
+        // this.openContentNote2(listNoThree);
+        this.hasPhoneNo = false;
+        this.phoneTitle = "系统中有多个该用户手机号，请选择后发送";
+        this.getPhoenNoFn();
+        this.iputPhoneNo();
+      } else {
+        // this.nowPhoneNoTwo = this.nowPhoneNo;
+        this.hasPhoneNo = true;
+        this.phoneTitle = "系统中没有用户手机号，请输入后发送";
+        this.iputPhoneNo();
+      }
+
+      // return false
+    },
+    sendNoteData(NoteDatatDir) {
+      this.ylorsend = '1'
+      this.NotePreviewData = NoteDatatDir;
+      console.log(this.nowPhoneNo);
+      if (
+        this.nowPhoneNo != "" &&
+        this.nowPhoneNo != undefined &&
+        this.nowPhoneNo != null
+      ) {
+        // this.sendNoteData2(NoteDatatDir);
+        this.hasPhoneNo = false;
+        this.phoneTitle = "系统中有多个该用户手机号，请选择后发送";
+        this.getPhoenNoFn();
+        this.iputPhoneNo();
+      } else {
+        // this.nowPhoneNoTwo = this.nowPhoneNo;
+        this.hasPhoneNo = true;
+        this.phoneTitle = "系统中没有用户手机号，请输入后发送";
+        this.iputPhoneNo();
+      }
+
+      // return false
+    },
+    //手机号码校验
+    phoneFn(phoneData) {
+      let regex = /^1\d{10}$/;
+      let resultFlag = true;
+      if (!regex.exec(phoneData)) {
+        resultFlag = false;
+      }
+      return resultFlag;
+    },
+    //填写手机号码提交
+    newInputFn() {
+      if (
+        this.nowPhoneNo == "" ||
+        this.nowPhoneNo == undefined ||
+        this.nowPhoneNo == null
+      ) {
+        if (this.newInpurPhone == "") {
+          this.$message.error("请输入手机号码！");
+          return false;
+        }
+        if (!this.phoneFn(this.newInpurPhone)) {
+          this.$message.error("手机号码格式不对！");
+          return false;
+        }
+        this.sendNowPhoneNo = this.newInpurPhone;
+      }
+
+      // this.closeOperation()
+      this.idSupernatant = false;
+      this.isShowInputPhone = false;
+      if(this.ylorsend == '2'){
+        this.openContentNote2(this.NotePreviewData);
+      }else{
+        this.sendNoteData2(this.NotePreviewData);
+      }
+    },
+    //短信显示预览
+    openContentNote2(listNoThree) {
       this.previewDisabel = this.isPhoneDisabel;
       this.NotePreviewData = listNoThree;
       listNoThree.type = "1";
@@ -1524,7 +1710,7 @@ export default {
       }
     },
     //短信发送
-    sendNoteData(NoteDatatDir) {
+    sendNoteData2(NoteDatatDir) {
       // this.tenData = true
       let NoteDatat;
       if (NoteDatatDir == "" || NoteDatatDir == undefined) {
@@ -1534,8 +1720,9 @@ export default {
       }
       NoteDatat.type = "1";
       this.userTsrL = JSON.parse(window.localStorage.getItem("userTsr"));
-      NoteDatat.phoneNo = this.nowPhoneNo;
+      NoteDatat.phoneNo = this.sendNowPhoneNo;
       NoteDatat.sender = this.userTsrL.TSR_SESSION.tsrno;
+      NoteDatat.openid = this.nowOpenIdData;
 
       NoteDatat = JSON.stringify(NoteDatat);
       console.log(NoteDatat);
@@ -1569,7 +1756,7 @@ export default {
         },
         failCallback: () => {}
       });
-
+// this.isPreview = false;
       this.tempSms({
         NoteData,
         successCallback: isSend => {
@@ -1599,6 +1786,7 @@ export default {
           sendMessageContent.mainTitle = this.PreviewData.mainTitle;
           sendMessageContent.subTitle = isSend.msg;
           sendMessageContent.moduleName = this.PreviewData.moduleName;
+          sendMessageContent.ToPhone = this.sendNowPhoneNo;
           this.mesageList.push(sendMessageContent);
           this.bottomshow();
           this.messageTypeData = "news";
@@ -1624,6 +1812,7 @@ export default {
           sendMessageContent.imgurl = this.PreviewData.imgurl;
           sendMessageContent.mainTitle = this.PreviewData.mainTitle;
           sendMessageContent.subTitle = this.PreviewData.subTitle;
+          sendMessageContent.ToPhone = this.sendNowPhoneNo;
           sendMessageContent.moduleName = this.PreviewData.moduleName;
           // console.log(sendMessageContent)
           this.mesageList.push(sendMessageContent);
@@ -1650,6 +1839,7 @@ export default {
       this.isPreview = false;
       this.isComeToNothing = false;
       this.isBinding = false;
+      this.isShowInputPhone = false;
     },
     //键盘发送
     sendKeydown() {
@@ -1690,9 +1880,10 @@ export default {
       if (this.chat_textarea == "") {
         return false;
       }
-
       this.isSengContent = true;
+      console.log(this.$store.getters.messageData.id);
       sendMessageContent.minIdData = this.$store.getters.messageData.id;
+      //console.log(this.$store.getters.messageData.id)
       this.mesageList.push(sendMessageContent);
       // console.log(this.mesageList.length)
       // console.log(sendMessageContent)
@@ -1700,13 +1891,14 @@ export default {
       let sendMessageContentD = JSON.stringify(sendMessageContent);
       var sendMessage = new FormData();
       sendMessage.append("sendMessage", sendMessageContentD);
+      console.log("------------->" + sendMessageContentD);
       this.sendMessageData({
         sendMessage,
         successCallback: () => {
           this.tenData = false;
           // this.mesageList.push(sendMessageContent);
-          console.log(this.mesageList.length);
-          console.log(this.mesageList[this.mesageList.length - 1].sendStatus);
+          //console.log(this.mesageList.length);
+          //console.log(this.mesageList[this.mesageList.length - 1].sendStatus);
           this.mesageList[this.mesageList.length - 1].sendStatus = 1;
           this.bottomshow();
           this.chat_textarea = "";
@@ -1718,7 +1910,7 @@ export default {
           // sendMessageContent.sendStatus = "-1";
           this.mesageList[this.mesageList.length - 1].sendStatus = "-1";
           // this.mesageList.push(sendMessageContent);
-          console.log(this.mesageList.length);
+          console.log(this.mesageList);
           this.bottomshow();
           this.chat_textarea = "";
           this.isSengContent = false;
@@ -1839,6 +2031,21 @@ export default {
               ) {
                 this.$store.getters.getMoreMessage[i].isMe = true;
               }
+              if (
+                this.$store.getters.getMoreMessage[i].ToPhone != "" &&
+                this.$store.getters.getMoreMessage[i].ToPhone != undefined &&
+                this.$store.getters.getMoreMessage[i].ToPhone != null
+              ) {
+                this.$store.getters.getMoreMessage[i].isMe = true;
+              }
+              
+              // if (
+              //   this.mesageList[i].mainTitle != "" &&
+              //   this.mesageList[i].mainTitle != undefined &&
+              //   this.mesageList[i].mainTitle != null
+              // ) {
+              //   this.mesageList[i].isMe = true;
+              // }
             }
             this.$store.getters.getMoreMessage.reverse();
             // console.log(this.$store.getters.getMoreMessage)
@@ -1853,7 +2060,7 @@ export default {
 
             // console.log('2' + '-' +this.$refs.chat_window_box.scrollHeight)
             if (this.$store.getters.getMoreMessage.length > 8) {
-              console.log(this.$store.getters.getMoreMessage.length);
+              console.log(this.$store.getters.getMoreMessage);
               this.$refs.chat_window_box.scrollTop = 900;
               // this.clickPt()
             }
@@ -2355,7 +2562,7 @@ export default {
     font-size: 14px;
   }
 }
-.clickMessage{
+.clickMessage {
   display: flex;
 }
 
@@ -2368,8 +2575,74 @@ export default {
     transform: scaleZ(360deg);
   }
 }
-.download-icon:hover{
-      cursor: pointer;
+.download-icon:hover {
+  cursor: pointer;
+}
+.input-phone {
+  margin: 13% auto 20px;
+  width: 580px;
+  padding-bottom: 48px;
+  background: rgba(255, 255, 255, 1);
+  border-radius: 8px;
+  position: relative;
+  .new-close-style {
+    width: 26px;
+    height: 26px;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+  }
+  .new-tips-style {
+    width: 75px;
+    margin: 0px auto;
+    padding: 30px 0;
+  }
+  .new-tips-content {
+    font-size: 20px;
+    color: rgba(51, 51, 51, 1);
+    text-align: center;
+  }
+  .new-input-phone {
+    width: 270px;
+    margin: 30px auto 0;
+    input {
+      text-align: center;
+    }
+  }
+  .new-input-btn {
+    width: 270px;
+    margin: 24px auto 0;
+    button {
+      width: 100%;
+    }
+  }
+}
+.new-phone-list {
+  li {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 18px;
+  }
+  .new-phone-select {
+    width: 22px;
+    height: 22px;
+    border: 2px solid rgba(80, 158, 226, 1);
+    border-radius: 50%;
+    box-sizing: border-box;
+    padding: 5px;
+    .new-phone-icon {
+      width: 8px;
+      height: 8px;
+      background: rgba(80, 158, 226, 1);
+      border-radius: 50%;
+    }
+  }
+  .new-phone-number {
+    line-height: 22px;
+    margin-left: 12px;
+    font-size: 20px;
+    color: #333;
+  }
 }
 </style>
 

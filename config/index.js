@@ -75,29 +75,11 @@ module.exports = {
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
     assetsPublicPath: '/tpdwt_web/dist/',
-    // proxyTable: {
-    //   '/tpdwt_web/': {
-    //     target: 'http://10.1.117.3:8001', // 你接口的域名
-    //     secure: false,
-    //     changeOrigin: true,
-    //     pathRewrite: {
-    //       '^/tpdwt_web': '/tpdwt_web'
-    //     }
-    //   },
-      // '/tpdwt_web/toGetClient.html': {
-      //   target: 'http://10.7.181.184:8090', // 你接口的域名
-      //   secure: false,
-      //   changeOrigin: true,
-      // pathRewrite: {
-      //   '^/tpdwt_web/toGetClient.html': '/tpdwt_web/toGetClient.html'
-      // }
-      // }
-    // },
     /** 
      * Source Maps
      */
 
-    productionSourceMap: false,
+    productionSourceMap: true,
     // https://webpack.js.org/configuration/devtool/#production
     devtool: '#source-map',
     

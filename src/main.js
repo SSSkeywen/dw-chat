@@ -16,6 +16,9 @@ import store from './store'
 import utils from '../static/js/utils'
 import html2canvas from 'html2canvas'
 
+import toolsTwo from '../static/js/toolsTwo.js'
+
+Vue.prototype.$toolsTwo = toolsTwo
 
 Vue.prototype.$utils = utils
 Vue.use(QRCode)

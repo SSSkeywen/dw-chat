@@ -78,8 +78,8 @@
                 <el-button class="btn_style" type="primary" @click="WechatPreview" :disabled="isDisabel" plain><i class="iconfont icon-weixin1"></i>&nbsp;微信预览</el-button>
             </div>
             <div v-else>
-                <el-button class="btn_style" type="primary" @click="sendNote" :disabled="isPhoneDisabel" plain><i class="iconfont icon-duanxin1"></i>&nbsp;短信发送</el-button>
-                <el-button class="btn_style" type="primary" @click="NotePreview" :disabled="isPhoneDisabel" plain><i class="iconfont icon-duanxin1"></i>&nbsp;短信预览</el-button>
+                <el-button class="btn_style" type="primary" @click="sendNote" plain><i class="iconfont icon-duanxin1"></i>&nbsp;短信发送</el-button>
+                <el-button class="btn_style" type="primary" @click="NotePreview" plain><i class="iconfont icon-duanxin1"></i>&nbsp;短信预览</el-button>
             </div>
         </div>
       </div>
@@ -348,9 +348,9 @@ export default {
               }
       },
       perSelect() {
-         if(this.isSms) {
-             return false
-         }
+        //  if(this.isSms) {
+        //      return false
+        //  }
         //   console.log(this.$refs.perNew.style.left)
         //   this.pitchDataNo = index
         //   this.isShowSelect = !this.isShowSelect

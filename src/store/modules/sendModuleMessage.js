@@ -265,6 +265,31 @@ const actions = {
             }
         })
     },
+    //获取手机号码
+    [types.GETCLIENTPHONENO]({ commit }, { getPhoneNoData, successCallback = () => { }, failCallback = () => { } }) {
+        axios({
+            method: 'post',
+            url: '/tpdwt_web/tm/getClientPhoneNo.html',
+            data: getPhoneNoData,
+            "Content-Type": "multipart/form-data"
+        }).then((res) => {
+            var result = res.data
+            console.log(result)
+            if (result.responseCode == 0) {
+                // state.idSend = result.result
+                successCallback(result.result)
+            } else {
+                console.log('获取手机号码失败')
+            }
+
+        }).catch(function (err) {
+            failCallback()
+            let res = err.response
+            if (err) {
+                console.log('获取手机号码失败' + res)
+            }
+        })
+    },
     //会话开关
     [types.UPDATACHAT]({ commit }, { unDataChat, successCallback = () => { }, failCallback = () => { } }) {
         axios({

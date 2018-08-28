@@ -29,7 +29,7 @@ const actions = {
             "Content-Type": "multipart/form-data"
         }).then((res) => {
             var result = res.data
-            // console.log(result)
+            console.log(result)
             if (result.responseCode == 0) {
                 state.userTsr = result.result
                 window.localStorage.setItem('userTsr', JSON.stringify(result.result))
@@ -109,20 +109,22 @@ const actions = {
             traditional: true,//属性在这里设置
         }).then((res) => {
             var result = res.data
-            state.messageData = result.result
+            console.log(res)
             if (result.responseCode == 0) {
+                state.messageData = result.result
                 successCallback()
             } else if (result.responseCode == 1){
                 alert(result.msg)
-                failCallbackTwo()
+                failCallback()
             } else if (result.responseCode == 3) {
                 alert(result.msg)
                 failCallback()
             } else if (result.responseCode == 9) {
                 alert(result.msg)
+                failCallbackTwo()
             }
         }).catch(function (err) {
-            
+            failCallbackTwo()
             let res = err.response
             if (err) {
                 console.log('客户信息轮播出错' + res)
