@@ -260,7 +260,7 @@
           </ul>
         </div>
         <div class="new-input-btn">
-          <el-button type="primary" @click="newInputFn">发送</el-button>
+          <el-button type="primary" @click="newInputFn">确认</el-button>
         </div>
       </div>
       <!-- 输入手机号码-end -->
@@ -306,7 +306,7 @@ export default {
       isShowInputPhone: false, //是否显示手机号码输入
       isbigImg: false, //图片放大蒙版是否显示
       bigImgData: "", //大图路径
-      ylorsend: '',
+      ylorsend: "",
       isMeImgPt: "",
       clickMessageData: "111",
       tenData: "",
@@ -468,7 +468,7 @@ export default {
           // this.$refs.clickMessage.setAttribute('href', canvas.toDataURL());
           // console.log(this.clickMessageData)
           // this.clickMessageData = canvas.toDataURL()
-          console.log(canvas.toDataURL());
+          // console.log(canvas.toDataURL());
           document
             .querySelector(".clickMessage")
             .setAttribute("href", canvas.toDataURL());
@@ -484,7 +484,7 @@ export default {
       this.getTsrHeadFn({
         getTsrHeadData,
         successCallback: () => {
-          console.log("刷新");
+          // console.log("刷新");
           window.location.reload();
         },
         failCallback: () => {}
@@ -502,14 +502,14 @@ export default {
       // };
       var newMun;
       window.onblur = () => {
-        console.log("失去焦点");
+        //console.log("失去焦点");
 
         newMun = this.selectIndex;
         this.selectChat(0);
-        console.log(this.selectIndex);
+        //console.log(this.selectIndex);
       };
       window.onfocus = () => {
-        console.log("进入页面");
+        //console.log("进入页面");
         // console.log(newMun);
         this.selectChat(newMun);
       };
@@ -601,6 +601,8 @@ export default {
             }
             return 0;
           });
+          // console.log('--------------------------------------')
+          // console.log(this.clientListData)
           // setTimeout(()=>{
           //   this.goOnFn()
           //   this.selectClientNameDataTwo()
@@ -643,7 +645,7 @@ export default {
       this.clientListGain({
         clientMessage,
         successCallback: () => {
-          // console.log(this.$store.getters.myChatData)
+          //console.log(this.$store.getters.myChatData)
           this.clientListData.length = 1;
           // console.log(this.clientListData)
           // if(this.userTsrL.fromType == 2){
@@ -906,7 +908,7 @@ export default {
         // this.$refs.personalOn.perSelectTwo(true, true)
       }
       if (index == "0") {
-        // this.$refs.personalOn.perSelectTwo(true, true)
+        this.$refs.personalOn.perSelectTwo(true, true)
         if (
           this.clientListData[index].OPENID != "" &&
           this.clientListData[index].OPENID != undefined &&
@@ -918,7 +920,7 @@ export default {
             userTsrL.TSR_SESSION.tsrposition == "QL" ||
             userTsrL.TSR_SESSION.tsrposition == "UM")
         ) {
-          // console.log(this.clientListData[index])
+          //console.log(this.clientListData[index])
           this.isDisabelStar = false;
           this.isDisabel = false;
           this.previewDisabel = false;
@@ -1017,7 +1019,7 @@ export default {
       let chatRecordMessageLs = this.clientListData[index].OPENID;
       this.nowOpenIdData = this.clientListData[index].OPENID;
       this.nowPhoneNo = this.clientListData[index].PHONENO;
-      // console.log(this.nowPhoneNo)
+      //console.log(this.nowPhoneNo)
       this.nowChatFlag = this.clientListData[index].chatFlag;
       var chatRecordMessageL = new FormData();
       chatRecordMessageL.append("openId", chatRecordMessageLs);
@@ -1029,7 +1031,7 @@ export default {
         chatRecordMessageL,
         successCallback: () => {
           this.mesageList = this.$store.getters.chatRecordList;
-          console.log(this.mesageList);
+          // console.log(this.mesageList);
           if (this.$store.getters.chatRecordList != "0") {
             // alert(11)
             for (let i = 0; i < this.mesageList.length; i++) {
@@ -1056,7 +1058,7 @@ export default {
               ) {
                 this.mesageList[i].isMe = true;
               }
-              
+
               // if (
               //   this.mesageList[i].mainTitle != "" &&
               //   this.mesageList[i].mainTitle != undefined &&
@@ -1163,7 +1165,7 @@ export default {
           }
         })
         .catch(function(err) {
-          console.log("消息轮训出错");
+         // console.log("消息轮训出错");
           // failCallback()
           // let res = err.response
           // if (err) {
@@ -1306,7 +1308,7 @@ export default {
       this.clientListGain({
         clientMessage,
         successCallback: () => {
-          console.log(this.$store.getters.myChatData);
+          //console.log(this.$store.getters.myChatData);
           if (this.userTsrL.fromType == 2) {
             // this.selectChat(0)
 
@@ -1335,7 +1337,7 @@ export default {
             ) {
               this.$store.getters.nowChat.className = "examine";
               this.clientListData.push(this.$store.getters.nowChat);
-              console.log(this.$store.getters.nowChat);
+              //console.log(this.$store.getters.nowChat);
               this.nowPhoneNo = this.$store.getters.nowChat.PHONENO;
               // this.selectChat(1)
               this.mesageList = this.$store.getters.chatRecordList;
@@ -1393,7 +1395,7 @@ export default {
           this.userTsrL = JSON.parse(window.localStorage.getItem("userTsr"));
           let returnDxData2 = new FormData();
           returnDxData2.append("tsrno", this.userTsrL.TSR_SESSION.tsrno);
-          console.log(this.userTsrL.TSR_SESSION.tsrno);
+         // console.log(this.userTsrL.TSR_SESSION.tsrno);
           // returnDxData.append('phoneno1', this.clientListData[0].PHONENO1)
           this.returnDxFn1({
             returnDxData2,
@@ -1403,7 +1405,7 @@ export default {
             },
 
             failCallback: () => {
-              console.log("qingqiuchengg8888");
+             // console.log("qingqiuchengg8888");
               this.$message.error(customerKeyzp);
             }
           });
@@ -1425,7 +1427,7 @@ export default {
             this.$refs.bindingFn.useqrcode(
               this.$store.getters.qrcodeLogionData
             );
-            console.log(this.$store.getters.qrcodeLogionData);
+            //console.log(this.$store.getters.qrcodeLogionData);
             // this.tsrnoBadingData == '工号已经绑定'
           },
           failCallback: () => {}
@@ -1473,7 +1475,7 @@ export default {
         successCallback: () => {
           this.PreviewTitleName = "微信预览";
           this.PreviewData = this.$store.getters.WechatPreviewData;
-          console.log(this.PreviewData);
+          //console.log(this.PreviewData);
         },
         failCallback: () => {}
       });
@@ -1488,26 +1490,23 @@ export default {
         getPhoneNoData,
         successCallback: result => {
           // if(result.length != '0'){
-            this.phoneListData.length = 0;
-            for (let item of result) {
-              let phoneDataJson = {
-                phoneNewData: item,
-                isSelectNowPhoneNo: false
-              };
-              this.phoneListData.push(phoneDataJson);
-            }
-            this.phoneListData[0].isSelectNowPhoneNo = true;
-            this.sendNowPhoneNo = this.phoneListData[0].phoneNewData;
-          // }
-          
-          console.log(this.phoneListData);
+          this.phoneListData.length = 0;
+          for (let item of result) {
+            let phoneDataJson = {
+              phoneNewData: item,
+              isSelectNowPhoneNo: false
+            };
+            this.phoneListData.push(phoneDataJson);
+          }
+          this.phoneListData[0].isSelectNowPhoneNo = true;
+          this.sendNowPhoneNo = this.phoneListData[0].phoneNewData;
         },
         failCallback: () => {}
       });
     },
     //选择发送的手机号码
     selectPhoneNoFn(index) {
-      console.log(index);
+      //console.log(index);
       for (let item of this.phoneListData) {
         item.isSelectNowPhoneNo = false;
       }
@@ -1522,9 +1521,9 @@ export default {
       this.isShowInputPhone = true;
     },
     openContentNote(listNoThree) {
-      this.ylorsend = '2'
+      this.ylorsend = "2";
       this.NotePreviewData = listNoThree;
-      console.log(this.nowPhoneNo);
+      // console.log(this.nowPhoneNo);
       if (
         this.nowPhoneNo != "" &&
         this.nowPhoneNo != undefined &&
@@ -1532,10 +1531,38 @@ export default {
       ) {
         // this.openContentNote2(listNoThree);
         this.hasPhoneNo = false;
-        this.phoneTitle = "系统中有多个该用户手机号，请选择后发送";
-        this.getPhoenNoFn();
-        this.iputPhoneNo();
+        this.phoneTitle = "该客户有多个手机号，请选择后发送";
+        // this.getPhoenNoFn();
+        // console.log(this.phoneListData.length)
+
+        let getPhoneNoData = new FormData();
+        getPhoneNoData.append("phone", this.nowPhoneNo);
+        this.getClientPhoneNoFn({
+          getPhoneNoData,
+          successCallback: result => {
+            // if(result.length != '0'){
+            this.phoneListData.length = 0;
+            for (let item of result) {
+              let phoneDataJson = {
+                phoneNewData: item,
+                isSelectNowPhoneNo: false
+              };
+              this.phoneListData.push(phoneDataJson);
+            }
+            this.phoneListData[0].isSelectNowPhoneNo = true;
+            this.sendNowPhoneNo = this.phoneListData[0].phoneNewData;
+            //console.log("two========>" + this.phoneListData.length);
+            if (this.phoneListData.length == 1) {
+              // this.sendNowPhoneNo = this.nowPhoneNo
+              this.openContentNote2(this.NotePreviewData);
+            } else {
+              this.iputPhoneNo();
+            }
+          },
+          failCallback: () => {}
+        });
       } else {
+        //console.log(this.nowPhoneNo)
         // this.nowPhoneNoTwo = this.nowPhoneNo;
         this.hasPhoneNo = true;
         this.phoneTitle = "系统中没有用户手机号，请输入后发送";
@@ -1545,9 +1572,9 @@ export default {
       // return false
     },
     sendNoteData(NoteDatatDir) {
-      this.ylorsend = '1'
+      this.ylorsend = "1";
       this.NotePreviewData = NoteDatatDir;
-      console.log(this.nowPhoneNo);
+      // console.log(this.nowPhoneNo);
       if (
         this.nowPhoneNo != "" &&
         this.nowPhoneNo != undefined &&
@@ -1555,9 +1582,40 @@ export default {
       ) {
         // this.sendNoteData2(NoteDatatDir);
         this.hasPhoneNo = false;
-        this.phoneTitle = "系统中有多个该用户手机号，请选择后发送";
-        this.getPhoenNoFn();
-        this.iputPhoneNo();
+        this.phoneTitle = "该客户有多个手机号，请选择后发送";
+        // this.getPhoenNoFn();
+        
+        let getPhoneNoData = new FormData();
+        getPhoneNoData.append("phone", this.nowPhoneNo);
+        this.getClientPhoneNoFn({
+          getPhoneNoData,
+          successCallback: result => {
+            // if(result.length != '0'){
+            this.phoneListData.length = 0;
+            for (let item of result) {
+              let phoneDataJson = {
+                phoneNewData: item,
+                isSelectNowPhoneNo: false
+              };
+              this.phoneListData.push(phoneDataJson);
+            }
+            this.phoneListData[0].isSelectNowPhoneNo = true;
+            this.sendNowPhoneNo = this.phoneListData[0].phoneNewData;
+            //console.log("========>" + this.phoneListData.length);
+            if (this.phoneListData.length == 1) {
+              this.sendNoteData2(this.NotePreviewData);
+            } else {
+              this.iputPhoneNo();
+            }
+          },
+          failCallback: () => {}
+        });
+        // console.log("========>" + this.phoneListData.length);
+        // if (this.phoneListData.length == 1 || this.phoneListData.length == 0) {
+        //   this.sendNoteData2(this.NotePreviewData);
+        // } else {
+        //   this.iputPhoneNo();
+        // }
       } else {
         // this.nowPhoneNoTwo = this.nowPhoneNo;
         this.hasPhoneNo = true;
@@ -1597,9 +1655,9 @@ export default {
       // this.closeOperation()
       this.idSupernatant = false;
       this.isShowInputPhone = false;
-      if(this.ylorsend == '2'){
+      if (this.ylorsend == "2") {
         this.openContentNote2(this.NotePreviewData);
-      }else{
+      } else {
         this.sendNoteData2(this.NotePreviewData);
       }
     },
@@ -1616,7 +1674,7 @@ export default {
         showtmData,
         successCallback: () => {
           this.PreviewTitleName = "短信预览";
-          console.log(this.$store.getters.WechatPreviewData);
+         // console.log(this.$store.getters.WechatPreviewData);
           this.PreviewData = this.$store.getters.WechatPreviewData;
         },
         failCallback: () => {}
@@ -1725,7 +1783,7 @@ export default {
       NoteDatat.openid = this.nowOpenIdData;
 
       NoteDatat = JSON.stringify(NoteDatat);
-      console.log(NoteDatat);
+     // console.log(NoteDatat);
       var NoteData = new FormData();
       NoteData.append("showtmData", NoteDatat);
       var showtmData = new FormData();
@@ -1756,7 +1814,7 @@ export default {
         },
         failCallback: () => {}
       });
-// this.isPreview = false;
+      // this.isPreview = false;
       this.tempSms({
         NoteData,
         successCallback: isSend => {
@@ -1881,7 +1939,7 @@ export default {
         return false;
       }
       this.isSengContent = true;
-      console.log(this.$store.getters.messageData.id);
+      //console.log(this.$store.getters.messageData.id);
       sendMessageContent.minIdData = this.$store.getters.messageData.id;
       //console.log(this.$store.getters.messageData.id)
       this.mesageList.push(sendMessageContent);
@@ -1910,7 +1968,7 @@ export default {
           // sendMessageContent.sendStatus = "-1";
           this.mesageList[this.mesageList.length - 1].sendStatus = "-1";
           // this.mesageList.push(sendMessageContent);
-          console.log(this.mesageList);
+        //  console.log(this.mesageList);
           this.bottomshow();
           this.chat_textarea = "";
           this.isSengContent = false;
@@ -2038,7 +2096,7 @@ export default {
               ) {
                 this.$store.getters.getMoreMessage[i].isMe = true;
               }
-              
+
               // if (
               //   this.mesageList[i].mainTitle != "" &&
               //   this.mesageList[i].mainTitle != undefined &&
@@ -2060,7 +2118,7 @@ export default {
 
             // console.log('2' + '-' +this.$refs.chat_window_box.scrollHeight)
             if (this.$store.getters.getMoreMessage.length > 8) {
-              console.log(this.$store.getters.getMoreMessage);
+              //console.log(this.$store.getters.getMoreMessage);
               this.$refs.chat_window_box.scrollTop = 900;
               // this.clickPt()
             }

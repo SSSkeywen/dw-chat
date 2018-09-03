@@ -76,7 +76,7 @@ const actions = {
             "Content-Type": "multipart/form-data"
         }).then((res) => {
             var result = res.data
-            console.log(result)
+           // console.log(result)
             if (result.responseCode == 0) {
                 state.cardDataList = result.result
                 successCallback()
@@ -150,7 +150,7 @@ const actions = {
             "Content-Type": "multipart/form-data"
         }).then((res) => {
             var result = res.data
-            console.log(result)
+           // console.log(result)
             if (result.responseCode == 0) {
                 state.qrcodeLogionData = result.result
                 successCallback()
@@ -249,7 +249,7 @@ const actions = {
             "Content-Type": "multipart/form-data"
         }).then((res) => {
             var result = res.data
-            console.log(result)
+          //  console.log(result)
             if (result.responseCode == 0) {
                 state.idSend = result.result
                 successCallback(state.idSend)
@@ -274,7 +274,7 @@ const actions = {
             "Content-Type": "multipart/form-data"
         }).then((res) => {
             var result = res.data
-            console.log(result)
+           // console.log(result)
             if (result.responseCode == 0) {
                 // state.idSend = result.result
                 successCallback(result.result)
@@ -323,7 +323,7 @@ const actions = {
             "Content-Type": "multipart/form-data"
         }).then((res) => {
             var result = res.data
-            console.log(result)
+         //   console.log(result)
             if (result.responseCode == 0) {
                 successCallback()
             } else {
@@ -370,7 +370,7 @@ const actions = {
             "Content-Type": "multipart/form-data"
         }).then((res) => {
             var result = res.data
-            console.log(result)
+          //  console.log(result)
             if (result.responseCode == 0) {
                 state.messageNoDataList = result.result
                 successCallback()
@@ -395,7 +395,7 @@ const actions = {
             "Content-Type": "multipart/form-data"
         }).then((res) => {
             var result = res.data
-            console.log(result)
+           // console.log(result)
             if (result.responseCode == 0) {
                 // state.messageNoDataList = result.result
                 successCallback()
@@ -448,7 +448,7 @@ const actions = {
             "Content-Type": "multipart/form-data"
         }).then((res) => {
             var result = res.data
-            console.log(result)
+        //    console.log(result)
             if (result.responseCode == 0) {
 
                 // if (1=1) {

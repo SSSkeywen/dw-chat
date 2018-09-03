@@ -197,7 +197,7 @@ import * as types from '../store/types.js'
 					this.ptContentImg = '使用上传头像'
 					this.f_photourl_is_default = '0'
 				}
-				console.log(this.f_photourl_is_default)
+				//console.log(this.f_photourl_is_default)
 				let userTsr = JSON.parse(window.localStorage.getItem('userTsr'))
 				let tsrno = userTsr.TSR_SESSION.tsrno
 				var pisDefaultData = new FormData()
@@ -221,14 +221,14 @@ import * as types from '../store/types.js'
 					tsrcardData,
 					successCallback: () => {
 						this.cardDataList = this.$store.getters.cardData
-						console.log(this.cardDataList)
+						//console.log(this.cardDataList)
 						this.Ctsrname = this.cardDataList.tsrInfo.tsrname
 						this.Ctsrno = this.cardDataList.tsrInfo.tsrno
 						this.Caccessphotourl = this.cardDataList.tsrInfo.accessphotourl
 						if(this.cardDataList.tsrInfo.accessphotourl != '' && this.cardDataList.tsrInfo.accessphotourl != null && this.cardDataList.tsrInfo.accessphotourl != undefined){
 							this.isDisabledImg = false
 						}
-						console.log(this.cardDataList.tsrInfo.f_photourl_is_default)
+					//	console.log(this.cardDataList.tsrInfo.f_photourl_is_default)
 						if (this.cardDataList.tsrInfo.f_photourl_is_default == '0'){
 							this.isMrImg = true
 							this.ptContentImg = '使用上传头像'
@@ -391,7 +391,7 @@ import * as types from '../store/types.js'
 						// this.optionsTwo = this.$store.getters.cardDataList;
 					},
 					failCallback: () => {
-						console('无数据')
+						//console('无数据')
 					}
 				})
 			},

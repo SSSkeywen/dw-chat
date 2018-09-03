@@ -280,6 +280,7 @@ export default {
       modelListData(num) {
         //   console.log(this.clientPortrayalDataList)
         //   this.geshu = this.clientPortrayalDataList.length
+        //console.log(num)
         let modelListWechat = new FormData()
             modelListWechat.append('wechatNo', num)
         this.modelList({
@@ -288,7 +289,7 @@ export default {
                 for(let i = 0; i <  this.$store.getters.cardListData.length;i ++ ){
                     this.selectableListData[i].temlist = this.$store.getters.cardListData[i].temlist
                     }
-                console.log(this.selectableListData)
+               // console.log(this.selectableListData)
                 },
                 failCallback: () => {
                 }
@@ -296,6 +297,7 @@ export default {
       },
       //顶部切换
       titleOPeration(index) {
+          //console.log(this.selectableListData)
         if (index === 0){
             for(let i = 0; i < this.titleLists.length; i++){
                 this.titleLists[i].titleClass = ''
@@ -334,6 +336,7 @@ export default {
       },
       perSelectTwo(isme,ismeTwo) {
           this.isSms = ismeTwo
+        //   console.log('=====================')
            if (isme){
             //   alert(111)
               this.$refs.perNew.style.left = '50%'
@@ -348,9 +351,10 @@ export default {
               }
       },
       perSelect() {
-        //  if(this.isSms) {
-        //      return false
-        //  }
+         if(this.isSms) {
+             return false
+         }
+        //  console.log('=====================')
         //   console.log(this.$refs.perNew.style.left)
         //   this.pitchDataNo = index
         //   this.isShowSelect = !this.isShowSelect
