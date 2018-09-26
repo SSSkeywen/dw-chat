@@ -86,18 +86,18 @@
         <div class="chat_interface">
           <div>
             <div class="chat_window_title">
-              <p class="chat_window_name" style="width:65%">{{ clientNameNow }}</p>
-              <div style="width: 18%;" class="download-icon">
-            <div class="clickMessage" style="display:flex;" @click="clickPtTwo">
+              <p class="chat_window_name" style="width:85%">{{ clientNameNow }}</p>
+              <div style="width: 9%;" class="download-icon">
+            <div class="clickMessage" style="display:flex;width: 5%;" @click="clickPtTwo">
               <div style="padding-top:3px;padding-right: 3px;">
                 <img :src="downLoadIcon" width="25px" height="26px">
               </div>
-              <span style="display:block;line-height:33px;">导出记录</span>
+              <!-- <span style="display:block;line-height:33px;">导出记录</span> -->
             </div>
           </div>
               <div class="chat_window_close">
-                <div><img src="../../static/images/close_icon.png" alt=""></div>
-                <p @click="closeConversation()">结束会话</p>
+                <div><img src="../../static/images/historyMessageIcon.png" alt=""></div>
+                <!-- <p @click="closeConversation()">结束会话</p> -->
               </div>
             </div>
             <div class="chat_message_list" ref="chat_window_box" @scroll="getMore">
@@ -211,6 +211,7 @@
                   <textarea placeholder="请输入内容(Ctrl＋Enter为换行)" v-model="chat_textarea" @keydown="sendKeydown" type="textarea" rows="5" autocomplete="off" validateevent="true" class="el-textarea__inner" style="min-height: 34px;"></textarea>
                 </div>
                 <el-button type="success" @click="sendOperation()" :disabled="isSengContent">发送↵</el-button>
+                <el-button type="success" @click="closeConversation()" :disabled="isSengContent">结束</el-button>
               </div>
             </div>
           </div>
@@ -402,7 +403,7 @@ export default {
     this.goOnFnTwo();
     this.bottomshow();
     this.judge();
-    this.selsectWindow();
+    // this.selsectWindow();
     // this.clickPt()
   },
   methods: {
@@ -908,6 +909,7 @@ export default {
         // this.$refs.personalOn.perSelectTwo(true, true)
       }
       if (index == "0") {
+        // console.log(index)
         this.$refs.personalOn.perSelectTwo(true, true)
         if (
           this.clientListData[index].OPENID != "" &&
@@ -946,8 +948,8 @@ export default {
       } else {
         // this.$refs.personalOn.perSelectTwo(false, true)
         // console.log(this.clientListData[index].PHONENO)
-        this.isPhoneDisabel = true;
-        this.previewDisabel = true;
+        this.isPhoneDisabel = false;
+        this.previewDisabel = false;
       }
       if (
         this.clientListData[index].OPENID != "" &&
@@ -965,7 +967,7 @@ export default {
         ) {
           this.$refs.personalOn.perSelectTwo(true, false);
         } else {
-          this.$refs.personalOn.perSelectTwo(true, true);
+          this.$refs.personalOn.perSelectTwo(true, false);
         }
       } else {
         if (
@@ -975,12 +977,12 @@ export default {
         ) {
           this.$refs.personalOn.perSelectTwo(false, true);
         } else {
-          this.$refs.personalOn.perSelectTwo(true, true);
+          // this.$refs.personalOn.perSelectTwo(false, true);
         }
         // this.isDisabelStar = true
         // this.isDisabel = true
         // this.previewDisabel = true
-        // this.$refs.personalOn.perSelectTwo(true, true)
+        // this.$refs.personalOn.perSelectTwo(false, true)
       }
       if (
         userTsrL.TSR_SESSION.tsrposition == "HQL" ||
@@ -1006,6 +1008,13 @@ export default {
       ) {
         this.isDisabelStar = true;
       }
+      if (index == "0") {
+        // console.log(index)
+        this.$refs.personalOn.perSelectTwo(true, true)
+        this.$refs.personalOn.clickMines()
+        }else{
+          this.$refs.personalOn.enterPage()
+        }
       //发送按钮解冻
       this.isSengContent = false;
       //取当前头像
@@ -1475,7 +1484,7 @@ export default {
         successCallback: () => {
           this.PreviewTitleName = "微信预览";
           this.PreviewData = this.$store.getters.WechatPreviewData;
-          //console.log(this.PreviewData);
+          console.log(this.PreviewData);
         },
         failCallback: () => {}
       });
@@ -1574,7 +1583,7 @@ export default {
     sendNoteData(NoteDatatDir) {
       this.ylorsend = "1";
       this.NotePreviewData = NoteDatatDir;
-      // console.log(this.nowPhoneNo);
+      console.log(this.nowPhoneNo);
       if (
         this.nowPhoneNo != "" &&
         this.nowPhoneNo != undefined &&
@@ -1590,6 +1599,7 @@ export default {
         this.getClientPhoneNoFn({
           getPhoneNoData,
           successCallback: result => {
+            console.log(result)
             // if(result.length != '0'){
             this.phoneListData.length = 0;
             for (let item of result) {
@@ -1783,7 +1793,7 @@ export default {
       NoteDatat.openid = this.nowOpenIdData;
 
       NoteDatat = JSON.stringify(NoteDatat);
-     // console.log(NoteDatat);
+     console.log(NoteDatat);
       var NoteData = new FormData();
       NoteData.append("showtmData", NoteDatat);
       var showtmData = new FormData();

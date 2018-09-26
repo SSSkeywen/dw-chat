@@ -469,6 +469,36 @@ const actions = {
             }
         })
     },
+    //计划书确认书
+    [types.GETJHSMESSAGE]({ commit }, { planData, successCallback = () => { }, failCallback = () => { } }) {
+        axios({
+            method: 'post',
+            url: '/tpdwt_web/tm/getJhsMessage.html',
+            data: planData,
+            "Content-Type": "multipart/form-data"
+        }).then((res) => {
+            var result = res.data
+            //    console.log(result)
+            if (result.responseCode == 0) {
+
+                // if (1=1) {
+                successCallback(result.result)
+                // console.log(result);
+                // } else {
+                // alert(result.result.errorMsg)
+                // }
+            } else {
+                failCallback()
+            }
+
+        }).catch(function (err) {
+
+            let res = err.response
+            if (err) {
+                console.log('计划书' + res)
+            }
+        })
+    },
 }
 
 const getters = {
