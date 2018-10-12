@@ -46,7 +46,7 @@
               </div>
               <div class="clientContent">
                 <p>{{ item.NICKNAME }}</p>
-                <p class="clientContentTwo">{{ item.MSGCONTENT }}</p>
+                <p class="clientContentTwo" v-html="item.MSGCONTENT"></p>
                 <p class="client_time">{{ item.SENDTIME}}</p>
               </div>
             </div>
@@ -84,19 +84,103 @@
       </hgroup>
       <div class="chat_content_dwon">
         <div class="chat_interface">
-          <div>
+          <div style="position: relative;">
+
+            <!-- 历史消息查询 -->
+            <section class="histroy-box" v-if="isShowHistoryMessage">
+              <header class="hb-header">
+                <div class="hb-header-list" :class="item.selectClientStyle" @click="historyMessageFn(index)" v-for="(item,index) in historySelectMessage" :key="index">
+                  <div class="hb-header-list-div">
+                    <img :src="item.profilePhoto" alt="">
+                  </div>
+                  <p v-text="item.clientName"></p>
+                </div>
+                <!-- <div class="hb-header-list">
+                  <div class="hb-header-list-div">
+                    <img src="../../static/images/bigkhIcon.png" alt="">
+                  </div>
+                  <p>客户</p>
+                </div> -->
+              </header>
+
+              <!-- 历史消息关闭按钮 -->
+              <div class="close-icon-btn" @click="closeHistoryMessageFn">
+                <img src="../../static/images/newClostThree.png" alt="" >
+              </div>
+
+              <div class="chat_message_list" ref="chat_window_box_two" @scroll="getMoreTwo">
+                <ul ref="chat_window_down" class="listpt">
+                  <li v-for="(item, index) in historyMesageList" :key="index">
+                    <div class="chat_message_text">
+                      <p class="chai_time">{{ item.CreateTime }}</p>
+                      <div class="chat_images" v-if="isChatTsrOuKh == '2'">
+                        <img :src="'/tpdwt_web/chat/getFile.html?filePath='+imgulrNow" alt="">
+                      </div>
+                      <div class="chat_images" v-else>
+                        <img src="../../static/images/headPortrait.jpg" alt="" v-if="isMeImgPt">
+                        <img :src="'/tpdwt_web/chat/getFile.html?a='+Math.random()+'&filePath='+accessphotourl" alt="" v-else>
+                      </div>
+                      <div class="text_content_box">
+                        <div class="chai_text_data" v-if="item.msgMold=='2'">
+                          <div class="imgContent">
+                            <span>{{ item.Content }}</span>
+                          </div>
+                          
+                        </div>
+                        <div class="chai_text_data" v-else>
+                          <div class="imgContent">
+                            <img v-if="item.MsgType=='2'" :src="'/tpdwt_web/chat/getFile.html?filePath='+item.localPicUrl" alt="" @click="imgbig(item.localPicUrl)">
+                            <div v-else-if="item.MsgType=='5'">
+                              <audio :src="item.localPicUrl" :autoplay="isPlayiing" ref="palyMuisc" controls  class="audio_music">
+                              </audio>
+                            </div>
+                            <div v-else-if="item.MsgType=='3'">
+                              <div class="myCardStyle">
+                                <div class="myCardStyleTop">
+                                  <div class="myCardStyleTopOne" v-if="item.imgurl!='null'&&item.imgurl!=''&&item.imgurl!='undefined'&&item.imgurl">
+                                      <img :src="'/tpdwt_web/tm/getFile.html?filePath='+item.imgurl" alt="">
+                                  </div>
+                                  <div class="myCardStyleTopTwo">
+                                    <p>{{ item.mainTitle }}</p>
+                                    <p v-html="item.subTitle.replace(/\%25/ig,'%')"></p>
+                                  </div>
+                                </div>
+                                <div class="myCardStyleDwon">{{ item.moduleName }} <span style="float:right;" v-if="!(item.imgurl!='null'&&item.imgurl!=''&&item.imgurl!='undefined'&&item.imgurl)">{{ item.ToPhone | filterphone }}</span></div>
+                                
+                              </div>
+                              </div>
+                            <!-- <span v-else>{{ item.Content }}</span> -->
+                            <div v-else v-html="item.Content.replace(/\😄/gi,'[笑脸]').replace(/\😷/gi,'[生病]').replace(/\😂/gi,'[破涕为笑]').replace(/\😝/gi,'[吐舌]').replace(/\😳/gi,'[脸红]').replace(/\😱/gi,'[恐惧]').replace(/\😔/gi,'[失望]').replace(/\😒/gi,'[无语]').replace(/\👻/gi,'[鬼魂]').replace(/\🙏/gi,'[合十]').replace(/\💪/gi,'[强壮]').replace(/\🎉/gi,'[庆祝]').replace(/\🎁/gi,'[礼物]').replace(/\[[\u4E00-\u9FA5]{1,4}\]/gi, emotion).replace(/\[[A-Z]{1,2}\]/gi, emotion)"></div>
+                          </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </section>
+
+
             <div class="chat_window_title">
               <p class="chat_window_name" style="width:85%">{{ clientNameNow }}</p>
               <div style="width: 9%;" class="download-icon">
-            <div class="clickMessage" style="display:flex;width: 5%;" @click="clickPtTwo">
+                <div class="clickMessage" style="display:flex;" @click="clickPtTwo">
               <div style="padding-top:3px;padding-right: 3px;">
+                <el-tooltip content="导出记录" placement="bottom" effect="light">
                 <img :src="downLoadIcon" width="25px" height="26px">
+                </el-tooltip>
               </div>
               <!-- <span style="display:block;line-height:33px;">导出记录</span> -->
             </div>
           </div>
               <div class="chat_window_close">
-                <div><img src="../../static/images/historyMessageIcon.png" alt=""></div>
+                <div @click="historyMessageFn(0)">
+                  <!-- <img src="../../static/images/historyMessageIcon.png" width="24px" height="24px"> -->
+                <el-tooltip content="查看记录" placement="bottom" effect="light">
+                  <img src="../../static/images/historyMessageIcon.png" width="24px" height="24px">
+                </el-tooltip>
+                </div>
                 <!-- <p @click="closeConversation()">结束会话</p> -->
               </div>
             </div>
@@ -125,7 +209,8 @@
                             <audio :src="item.localPicUrl" :autoplay="isPlayiing" ref="palyMuisc" controls  class="audio_music">
                             </audio>
                           </div>
-                          <span v-else>{{ item.Content }}</span>
+                          <!-- <span v-else>{{ item.Content }}</span> -->
+                          <div v-else v-html="item.Content.replace(/\😄/gi,'[笑脸]').replace(/\😷/gi,'[生病]').replace(/\😂/gi,'[破涕为笑]').replace(/\😝/gi,'[吐舌]').replace(/\😳/gi,'[脸红]').replace(/\😱/gi,'[恐惧]').replace(/\😔/gi,'[失望]').replace(/\😒/gi,'[无语]').replace(/\👻/gi,'[鬼魂]').replace(/\🙏/gi,'[合十]').replace(/\💪/gi,'[强壮]').replace(/\🎉/gi,'[庆祝]').replace(/\🎁/gi,'[礼物]').replace(/\[[\u4E00-\u9FA5]{1,4}\]/gi, emotion).replace(/\[[A-Z]{1,2}\]/gi, emotion)"></div>
                           <!-- <span>{{ item.Content }}</span> -->
                           <!-- <img :src="" alt=""> -->
                         </div>
@@ -156,38 +241,21 @@
                                 </div>
                                 <div class="myCardStyleTopTwo">
                                   <p>{{ item.mainTitle }}</p>
-                                  <p>{{ item.subTitle }}</p>
+                                  <p  v-html="item.subTitle.replace(/\%25/ig,'%')"></p>
                                 </div>
                               </div>
                               <div class="myCardStyleDwon">{{ item.moduleName }} <span style="float:right;" v-if="!(item.imgurl!='null'&&item.imgurl!=''&&item.imgurl!='undefined'&&item.imgurl)">{{ item.ToPhone | filterphone }}</span></div>
                               
                             </div>
                           </div>
-                          <!-- <div v-else-if="item.MsgType=='1'">
-                            <div class="myCardStyle">
-                              <div class="myCardStyleTop"> -->
-                                <!-- <div class="myCardStyleTopOne" v-if="item.MsgType=='1'"> -->
-                                  <!-- <div v-if="item.imgurl!='null'&&item.imgurl!=''&&item.imgurl!='undefined'"> -->
-                                    <!-- <img :src="item.imgurl" alt=""> -->
-                                  <!-- </div> -->
-                                  
-                                <!-- </div> -->
-                                <!-- <div class="myCardStyleTopTwo">
-                                  <p>{{ item.mainTitle }}</p>
-                                  <p>{{ item.subTitle }}</p>
-                                </div>
-                              </div>
-                              <div class="myCardStyleDwon">{{ item.moduleName }}</div>
-                            </div>
-                          </div> -->
                           <div v-else>
-                            <span>{{ item.Content }}</span>
-                            <!-- <textarea disabled placeholder="请输入内容(Ctrl＋Enter为换行)" v-model="item.Content" @keydown="sendKeydown" type="textarea" autocomplete="off" validateevent="true" class="el-textarea__inner" style="height: auto!important;width: auto!important;background: transparent;border: none;"></textarea> -->
+                            <div v-html="item.Content.replace(/\😄/gi,'[笑脸]').replace(/\😷/gi,'[生病]').replace(/\😂/gi,'[破涕为笑]').replace(/\😝/gi,'[吐舌]').replace(/\😳/gi,'[脸红]').replace(/\😱/gi,'[恐惧]').replace(/\😔/gi,'[失望]').replace(/\😒/gi,'[无语]').replace(/\👻/gi,'[鬼魂]').replace(/\🙏/gi,'[合十]').replace(/\💪/gi,'[强壮]').replace(/\🎉/gi,'[庆祝]').replace(/\🎁/gi,'[礼物]').replace(/\[[\u4E00-\u9FA5]{1,4}\]/gi, emotion).replace(/\[[A-Z]{1,2}\]/gi, emotion)"></div>
                           </div>
                         </div>
                       </div>
                       <div class="chat_images">
-                        <img :src="'/tpdwt_web/chat/getFile.html?filePath='+accessphotourl" alt="">
+                        <img src="../../static/images/headPortrait.jpg" alt="" v-if="isMeImgPt">
+                        <img :src="'/tpdwt_web/chat/getFile.html?filePath='+accessphotourl" alt="" v-else>
                       </div>
                     </div>
                   </div>
@@ -199,6 +267,21 @@
                 <el-button type="success" @click="openConversationTwo()" :disabled="isDisabelStar">开始会话</el-button>
               </div>
               <div v-else class="chat_input_box">
+                <div class="reply_box">
+                  <div class="quick_emjio" @click="isShowEmotionFn">
+                    <el-tooltip content="表情" placement="top" effect="light">
+                    <img src="../../static/images/emjioIcon.png" width="24px" height="24px">
+                    </el-tooltip>
+                  </div>
+                  <div class="input_reply_message" @click="qucikMessageInput">
+                    <el-tooltip content="快捷回复" placement="top" effect="light">
+                    <img src="../../static/images/inputMessageIcon.png"  width="24px" height="24px">
+                    </el-tooltip>
+                  </div>
+                </div>
+                <div class="emotion_style" v-if="isShowEmotion">
+                  <emotion @emotion="handleEmotion" :height="200" ></emotion>
+                </div>
                 <!-- <el-input
                   type="textarea"
                   :rows="5"
@@ -208,11 +291,43 @@
                   >
                 </el-input> -->
                 <div class="el-textarea">
-                  <textarea placeholder="请输入内容(Ctrl＋Enter为换行)" v-model="chat_textarea" @keydown="sendKeydown" type="textarea" rows="5" autocomplete="off" validateevent="true" class="el-textarea__inner" style="min-height: 34px;"></textarea>
+                  <textarea placeholder="请输入内容(Enter为发送；Ctrl＋Enter为换行)" @focus="isShowEmotion=false" v-model="chat_textarea" @keydown="sendKeydown" type="textarea" rows="3" autocomplete="off" validateevent="true" class="el-textarea__inner" style="min-height: 34px;"></textarea>
                 </div>
                 <el-button type="success" @click="sendOperation()" :disabled="isSengContent">发送↵</el-button>
                 <el-button type="success" @click="closeConversation()" :disabled="isSengContent">结束</el-button>
               </div>
+
+              <!-- 快捷回复输入框 -->
+              <section class="qucik-box" v-if="isOpenQucik">
+                <div class="qucik-one">
+                  <p>设置快捷回复（200字以内）</p>
+                  <el-select v-model="qucikValue" @change="qucikListFn" placeholder="请选择">
+                    <el-option
+                      v-for="item in qucikLists"
+                      :key="item.value"
+                      :label="item.value"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+                </div>
+                <div class="el-textarea">
+                  <textarea placeholder="请输入" maxlength="200" v-model="qucikListsNow" type="textarea" rows="3" autocomplete="off" validateevent="true" class="el-textarea__inner" style="height: 96px;"></textarea>
+                </div>
+                <el-button type="success" @click="saveMessageFn" >确定</el-button>
+                <div class="cose_btn" @click="qucikMessageInput">
+                  <img src="../../static/images/newCloseIconThree.png" alt="">
+                </div>
+              </section>
+
+              <!-- 快捷回复列表 -->
+              <section class="qucik-list" v-if="isShowqucikList">
+                <ul>
+                  <li v-for="(item,index) in qucikLists" :key="index" @click="addQucikMessageContent(item)">
+                    <p v-html="item.content"></p>
+                  </li>
+                </ul>
+              </section>
+
             </div>
           </div>
         </div>
@@ -286,6 +401,7 @@ import comeToNothing from "../components/comeToNothing";
 import { toPhone } from "@/filter/filterphone.js";
 import * as types from "../store/types.js";
 import { mapActions } from "vuex";
+import Emotion from '@/components/Emotion/index'
 
 export default {
   components: {
@@ -293,7 +409,8 @@ export default {
     MyCard,
     Preview,
     Binding,
-    comeToNothing
+    comeToNothing,
+    Emotion
   },
   data: function() {
     return {
@@ -308,7 +425,7 @@ export default {
       isbigImg: false, //图片放大蒙版是否显示
       bigImgData: "", //大图路径
       ylorsend: "",
-      isMeImgPt: "",
+      isMeImgPt: false,
       clickMessageData: "111",
       tenData: "",
       contentText: false,
@@ -384,7 +501,81 @@ export default {
           clientImg: "",
           Content: ""
         }
-      ]
+      ],
+
+      //表情显示
+      isShowEmotion:false,
+
+      //历史消息
+      isShowHistoryMessage:false,
+      ishistoryPhoto: require("../../static/images/headPortrait.jpg"),
+      isChatTsrOuKh:'',
+      historyMesageList:[
+        {
+          messageTiem: "",
+          clientImg: "",
+          Content: ""
+        }
+      ],
+      historySelectMessage:[
+        {
+          profilePhoto:require("../../static/images/bigTSLIcon.png"),
+          clientName:'坐席',
+          selectClientStyle:'hb-header-select'
+        },{
+          profilePhoto:require("../../static/images/bigkhIcon.png"),
+          clientName:'客户',
+          selectClientStyle:''
+        }
+      ],
+
+      //快捷回复列表
+      isOpenQucik:false,  //是否打开快捷回复
+      isShowqucikList: false, //是否打开快捷回复列表
+      qucikListsNow: "",
+      qucikLists: [
+        {
+          value: "1",
+          content: ""
+        },
+        {
+          value: "2",
+          content: ""
+        },
+        {
+          value: "3",
+          content: ""
+        },
+        {
+          value: "4",
+          content: ""
+        },
+        {
+          value: "5",
+          content: ""
+        },
+        {
+          value: "6",
+          content: ""
+        },
+        {
+          value: "7",
+          content: ""
+        },
+        {
+          value: "8",
+          content: ""
+        },
+        {
+          value: "9",
+          content: ""
+        },
+        {
+          value: "10",
+          content: ""
+        }
+      ],
+      qucikValue: "1"
     };
   },
   filters: {
@@ -403,7 +594,9 @@ export default {
     this.goOnFnTwo();
     this.bottomshow();
     this.judge();
-    // this.selsectWindow();
+    this.selsectWindow();
+
+    this.getFastReplyFnBox()
     // this.clickPt()
   },
   methods: {
@@ -430,7 +623,9 @@ export default {
       upSataStatus: types.UPDATACHATSTATUS,
       getTsrHeadFn: types.GETTSRHEAD,
       getvicerecord: types.VOICERECORD,
-      getClientPhoneNoFn: types.GETCLIENTPHONENO
+      getClientPhoneNoFn: types.GETCLIENTPHONENO,
+      getFastReplyFn: types.GETFASTREPLY, //获取快捷回复列表
+      addFastReplyFn: types.ADDFASTREPLY, //添加快捷回复列表
     }),
     //点击生成图片的方法
     clickPtTwo() {
@@ -446,6 +641,221 @@ export default {
         failCallback: () => {}
       });
     },
+
+    //发送表情
+    handleEmotion (i) {
+      this.chat_textarea += i
+    },
+    // 将匹配结果替换表情图片
+    emotion (res) {
+      let word = res.replace(/\[|\]/gi,'')
+      const list = ['微笑', '撇嘴', '色', '发呆', '得意', '流泪', '害羞', '闭嘴', '睡', '大哭', '尴尬', '发怒', '调皮', '呲牙', '惊讶', '难过', '囧', '抓狂', '吐', '偷笑', '愉快', '白眼', '傲慢', '困', '惊恐', '流汗', '憨笑', '悠闲', '奋斗', '咒骂', '疑问', '嘘', '晕', '衰', '骷髅', '敲打', '再见', '擦汗', '抠鼻', '鼓掌', '坏笑', '左哼哼', '右哼哼', '哈欠', '鄙视', '委屈', '快哭了', '阴险', '亲亲', '可怜', '菜刀', '西瓜', '啤酒', '咖啡', '猪头', '玫瑰', '凋谢', '嘴唇', '爱心', '心碎', '蛋糕', '炸弹', '便便', '月亮', '太阳', '拥抱', '强', '弱', '握手', '胜利', '抱拳', '勾引', '拳头', 'OK', '跳跳', '发抖', '怄火', '转圈', '笑脸', '生病', '破涕为笑', '吐舌', '脸红', '恐惧', '失望', '无语', '嘿哈', '捂脸','奸笑','机智','皱眉','耶','鬼魂','合十','强壮','庆祝','礼物','红包','發','小狗']
+      let index = list.indexOf(word)
+      // return `<img src="https://res.wx.qq.com/mpres/htmledition/images/icon/emotion/${index}.gif" alt="${word}">`   
+// .replace(/\[笑脸\]/g, "😄").replace(/\[生病\]/g, "😷").replace(/\[破涕为笑\]/g, "😂").replace(/\[吐舌\]/g, "😝").replace(/\[脸红\]/g, "😳").replace(/\[恐惧\]/g, "😱").replace(/\[失望\]/g, "😔").replace(/\[无语\]/g, "😒").replace(/\[鬼魂\]/g, "👻").replace(/\[合十\]/g, "🙏").replace(/\[强壮\]/g, "💪").replace(/\[庆祝\]/g, "🎉").replace(/\[礼物\]/g, "🎁");
+
+      return `<img src="./static/images/emotion/${index}.png" alt="${word}" width="18px" height="18px">`
+    },
+    emotionTwo (res) {
+      console.log(res)
+      return res
+    },
+    //打开表情
+    isShowEmotionFn(){
+      // this.newCloseWindowFn()
+      this.isOpenQucik = false
+      this.isShowEmotion = !this.isShowEmotion
+    },
+    //关闭表情和历史消息列表
+    newCloseWindowFn(){
+      this.isShowEmotion = false
+      this.isOpenQucik = false
+      this.isShowqucikList = false
+    },
+
+    //历史消息列表
+    historyMessageFn(index){
+      this.newCloseWindowFn()
+
+      this.isShowHistoryMessage = true
+      for(let item of this.historySelectMessage){
+        item.selectClientStyle=''
+      }
+      this.historySelectMessage[index].selectClientStyle = 'hb-header-select'
+
+      let num = index;
+      num++
+
+      this.isChatTsrOuKh = num
+      var chatRecordMessageL = new FormData();
+      chatRecordMessageL.append("openId", this.nowOpenIdData);
+      chatRecordMessageL.append("phoneNo", this.nowPhoneNo);
+      chatRecordMessageL.append("select", num);
+      this.clientListEecord({
+        chatRecordMessageL,
+        successCallback: () => {
+          // for(let i = 0; i < this.$store.getters.hostoryChatRecordList.length; i ++){
+          //   // console.log(this.isChatTsrOuKh)
+          //   if(this.isChatTsrOuKh == '2'){
+          //     this.$store.getters.hostoryChatRecordList[i].IMGURLNOW = this.imgulrNow;
+          //   }else{
+          //     // console.log(this.isMeImgPt)
+          //       if(this.isMeImgPt){
+          //         // console.log(this.ishistoryPhoto)
+          //         this.$store.getters.hostoryChatRecordList[i].IMGURLNOW =this.ishistoryPhoto
+          //       }else{
+          //         this.$store.getters.hostoryChatRecordList[i].IMGURLNOW = this.accessphotourl
+          //       }
+          //     // this.$store.getters.hostoryChatRecordList[i].IMGURLNOW = '/tpdwt_web/chat/getFile.html?filePath='+this.accessphotourl
+          //   }
+            
+          // }
+
+          this.historyMesageList = this.$store.getters.hostoryChatRecordList;
+          this.bottomshowTwo()
+          },
+        failCallback: () => {}
+        })
+    },
+    //关闭历史消息
+    closeHistoryMessageFn(){
+      this.isShowHistoryMessage = false
+    },
+    //获取更多信息
+    getMoreTwo() {
+      let chat_scroll_height = this.$refs.chat_window_box_two.scrollHeight;
+      if (this.$refs.chat_window_box_two.scrollTop == 0) {
+        if (this.historyMesageList.length == 0) {
+          return false;
+        }
+        let getMoreMessData = new FormData();
+        getMoreMessData.append("id", this.historyMesageList[0].id);
+        getMoreMessData.append("openId", this.nowOpenIdData);
+        getMoreMessData.append("phoneNo", this.nowPhoneNo);
+        getMoreMessData.append("select", this.isChatTsrOuKh);
+        this.getMoreMess({
+          getMoreMessData,
+          successCallback: () => {
+            // for (let i = 0; i < this.mesageList.length; i++) {
+            //   this.$store.getters.chatRecordList[i].isMe = "";
+            //   this.$store.getters.chatRecordList[i].IMGURLNOW = this.imgulrNow;
+            // for (
+            //   let i = 0;
+            //   i < this.$store.getters.getHistoryMoreMessage.length;
+            //   i++
+            // ){
+            //   if(this.isChatTsrOuKh == '2'){
+            //     this.$store.getters.getHistoryMoreMessage[i].IMGURLNOW = this.imgulrNow;
+            //   }else{
+            //     if(this.isMeImgPt){
+            //       this.$store.getters.getHistoryMoreMessage[i].IMGURLNOW =this.ishistoryPhoto
+            //     }else{
+            //       this.$store.getters.getHistoryMoreMessage[i].IMGURLNOW = this.accessphotourl
+            //     }
+            //   }
+            // }
+            
+            this.$store.getters.getHistoryMoreMessage.reverse();
+            for (
+              let i = 0;
+              i < this.$store.getters.getHistoryMoreMessage.length;
+              i++
+            ) {
+              this.$store.getters.getHistoryMoreMessage[i].IMGURLNOW = this.imgulrNow;
+              this.historyMesageList.unshift(this.$store.getters.getHistoryMoreMessage[i]);
+            }
+            if (this.$store.getters.getHistoryMoreMessage.length > 8) {
+              this.$refs.chat_window_box_two.scrollTop = 900;
+            }
+          },
+          failCallback: () => {}
+        });
+      }
+    },
+
+
+    //选择快捷回复列表
+    qucikListFn() {
+      // this.newCloseWindowFn()
+      let qucikNum = this.qucikValue
+      qucikNum--
+      this.qucikListsNow = this.qucikLists[qucikNum].content
+    },
+
+    //快捷回复录入
+    qucikMessageInput(){
+      this.isShowEmotion = false
+      let qucikNum = this.qucikValue
+      qucikNum--
+      this.qucikListsNow = this.qucikLists[qucikNum].content
+      this.isOpenQucik = !this.isOpenQucik
+    },
+
+    //保存快捷回复
+    saveMessageFn(){
+      let qucikNum = this.qucikValue
+          qucikNum--
+      let userTsrL = JSON.parse(window.localStorage.getItem("userTsr"));
+      let addfastReplyData = new FormData();
+      addfastReplyData.append("tsrno", userTsrL.TSR_SESSION.tsrno);
+      addfastReplyData.append("serialnum", this.qucikValue);
+      addfastReplyData.append("content", this.qucikListsNow);
+      addfastReplyData.append("id", this.qucikLists[qucikNum].ID);
+      console.log(this.qucikListsNow)
+      console.log(userTsrL.TSR_SESSION.tsrno)
+      console.log(this.qucikValue)
+      this.addFastReplyFn({
+        addfastReplyData,
+        successCallback: () => {
+          console.log(this.qucikListsNow)
+          let qucikNum = this.qucikValue
+          qucikNum--
+          this.$set(
+            this.qucikLists[qucikNum],
+            "content",
+            this.qucikListsNow
+          );
+          this.$message.success('添加成功');
+        },
+        failCallback: () => {}
+      });
+
+      
+    },
+
+    //获取快捷回复列表
+    getFastReplyFnBox(){
+      let userTsrL = JSON.parse(window.localStorage.getItem("userTsr"));
+      let fastReplyData = new FormData();
+      fastReplyData.append("tsrno", userTsrL.TSR_SESSION.tsrno);
+      // console.log(userTsrL.TSR_SESSION.tsrno)
+      this.getFastReplyFn({
+        fastReplyData,
+        successCallback: (result) => {
+          // console.log(result)
+          for(let i = 0; i< result.length; i++){
+            let serialnum = result[i].SERIALNUM
+            serialnum--
+            this.$set(
+            this.qucikLists[serialnum],
+            "content",
+            result[i].CONTENT
+          );
+            this.qucikLists[serialnum].ID = result[i].ID
+          }
+          // console.log(this.qucikLists)
+        },
+        failCallback: () => {}
+      });
+    },
+
+    //将快捷回复内容加入输入框
+    addQucikMessageContent(result){
+      this.chat_textarea = result.content
+      this.isShowqucikList = !this.isShowqucikList
+    },
+
+
     clickPt() {
       //创建一个新的canvas
       let canvas2 = document.createElement("canvas");
@@ -646,35 +1056,13 @@ export default {
       this.clientListGain({
         clientMessage,
         successCallback: () => {
-          //console.log(this.$store.getters.myChatData)
           this.clientListData.length = 1;
-          // console.log(this.clientListData)
-          // if(this.userTsrL.fromType == 2){
-          //   // this.selectChat(0)
-
-          //   //当前聊天
-          //     this.$store.getters.myChatData.className='examine'
-          //     this.clientNameNow = this.$store.getters.myChatData.NICKNAME
-          //     this.mesageList = this.$store.getters.chatRecordList
-
-          //     for (let i = 0; i < this.mesageList.length; i ++){
-          //       if (this.mesageList[i].ToUserName == this.$store.getters.myChatData.OPENID){
-          //         this.mesageList[i].isMe = false
-          //       }
-          //     }
-          //     // this.selectChat(0)
-          //   }
-          // this.$store.getters.myChatData.HEADERIMG = this.accessphotourl
-          // this.clientListData.push(this.$store.getters.myChatData)
-          //
           if (this.userTsrL.fromType == 1) {
             if (
               this.$store.getters.nowChat != "" &&
               this.$store.getters.nowChat != undefined
             ) {
-              // this.$store.getters.nowChat.className='examine'
               this.clientListData.push(this.$store.getters.nowChat);
-              // this.selectChat(1)
               this.mesageList = this.$store.getters.chatRecordList;
             }
           }
@@ -871,6 +1259,7 @@ export default {
     // },
     //选择会话
     selectChat(index) {
+      this.newCloseWindowFn()
       //  if (index == 0){
       //    this.$refs.personalOn.perSelectTwo(true)
       //  }else {
@@ -886,7 +1275,10 @@ export default {
         this.clientListData[i].chatFlag = "end";
       }
       // console.log(this.clientListData)
-      this.clientListData[index].UNREADSUM = 0;
+      if(this.clientListData[index].UNREADSUM !=undefined){
+        this.clientListData[index].UNREADSUM = 0;
+      }
+      
       // console.log(this.clientListData[index])
       if (
         this.clientListData[index].OPENID != "" &&
@@ -910,7 +1302,7 @@ export default {
       }
       if (index == "0") {
         // console.log(index)
-        this.$refs.personalOn.perSelectTwo(true, true)
+        this.$refs.personalOn.perSelectTwo(true, true);
         if (
           this.clientListData[index].OPENID != "" &&
           this.clientListData[index].OPENID != undefined &&
@@ -1010,10 +1402,10 @@ export default {
       }
       if (index == "0") {
         // console.log(index)
-        this.$refs.personalOn.perSelectTwo(true, true)
-        this.$refs.personalOn.clickMines()
-        }else{
-          this.$refs.personalOn.enterPage()
+        this.$refs.personalOn.perSelectTwo(true, true);
+        this.$refs.personalOn.clickMines();
+      } else {
+        this.$refs.personalOn.enterPage();
         }
       //发送按钮解冻
       this.isSengContent = false;
@@ -1075,6 +1467,14 @@ export default {
               // ) {
               //   this.mesageList[i].isMe = true;
               // }
+              // if(this.mesageList[i].Content!=''&&this.mesageList[i].Content!=undefined){
+              //   this.$set(
+              //   this.mesageList[i],
+              //   "Content",
+              //   this.mesageList[i].Content.replace(/\/\:\:\)/g, "[微笑]").replace(/\/\:\:\~/g, "[撇嘴]")
+              // );
+              // }
+              
             }
           }
 
@@ -1131,9 +1531,14 @@ export default {
                   if (messages[i].FromUserName == "system") {
                     messages[i].isMe = true;
                   }
-                  // alert(11)
+                  // alert(11)/\b\w+\b/g
                   messages[i].IMGURLNOW = this.imgulrNow;
-                  console.log(messages[i]);
+          //         console.log(messages[i].Content.replace(/\/\:\:\)/g, "[微笑]"));
+          //         this.$set(
+          //   messages[i],
+          //   "Content",
+          //   messages[i].Content.replace(/\/\:\:\)/g, "[微笑]").replace(/\/\:\:\~/g, "[撇嘴]")
+          // );
                   this.mesageList.push(messages[i]);
                 } else {
                   // alert(22)
@@ -1944,8 +2349,11 @@ export default {
       sendMessageContent.send_error = false;
       this.messageTypeData = "text";
       sendMessageContent.sendStatus = "0";
-      sendMessageContent.Content = this.chat_textarea;
+      // sendMessageContent.Content = this.chat_textarea
+      sendMessageContent.Content = this.chat_textarea.replace(/\[笑脸\]/g, "😄").replace(/\[生病\]/g, "😷").replace(/\[破涕为笑\]/g, "😂").replace(/\[吐舌\]/g, "😝").replace(/\[脸红\]/g, "😳").replace(/\[恐惧\]/g, "😱").replace(/\[失望\]/g, "😔").replace(/\[无语\]/g, "😒").replace(/\[鬼魂\]/g, "👻").replace(/\[合十\]/g, "🙏").replace(/\[强壮\]/g, "💪").replace(/\[庆祝\]/g, "🎉").replace(/\[礼物\]/g, "🎁");
       if (this.chat_textarea == "") {
+        //当没有输入消息是打开消息列表
+        this.isShowqucikList = !this.isShowqucikList
         return false;
       }
       this.isSengContent = true;
@@ -2159,6 +2567,29 @@ export default {
         }
       }, 0);
     },
+
+    //显示最底部信息
+    bottomshowTwo() {
+      let count = 0;
+      let interval = setInterval(() => {
+        if (count > 200) {
+          clearInterval(interval);
+        }
+        count++;
+        if (
+          this.$refs.chat_window_box_two.scrollTop !=
+          this.$refs.chat_window_box_two.scrollHeight
+        ) {
+          this.$refs.chat_window_box_two.scrollTop = this.$refs.chat_window_box_two.scrollHeight;
+        }
+        if (
+          this.$refs.chat_window_box_two.scrollTop ==
+          this.$refs.chat_window_box_two.scrollHeight
+        ) {
+          clearInterval(interval);
+        }
+      }, 0);
+    },
     //音乐播放
     audioPlay() {
       // alert(this.$refs.palyMuisc);
@@ -2356,6 +2787,73 @@ export default {
         width: 660px;
         height: 818px;
         background: #ffffff;
+
+        //历史消息列表样式
+        .histroy-box{
+          position: absolute;
+          width:100%;
+          height:100%;
+          background:rgba(255,255,255,1);
+          box-shadow:0px 0px 8px rgba(1,8,11,0.2);
+          z-index: 9;
+          left: 0px;
+          top: 0px;
+          .chat_message_list{
+                height: 758px;
+          }
+          .hb-header{
+            display: flex;
+            .hb-header-list{
+              width:50%;
+              height:64px;
+              cursor: pointer;
+              border-bottom: 1px solid rgba(1,8,11,0.2);
+              display: flex;
+              justify-content: center;
+              box-sizing: border-box;
+              padding: 14px 0;
+              line-height: 32px;
+              .hb-header-list-div{
+                img{
+                  width: 32px;
+                  height:32px;
+                  display: block;
+                }
+              }
+              p{
+                margin-left: 12px;
+                font-size:24px;
+                font-family:Adobe Heiti Std R;
+                font-weight:normal;
+                color:rgba(3,153,218,1);
+              }
+            }
+            .hb-header-select{
+              background:rgba(241,245,248,1);
+            }
+            .hb-header-list:first-child{
+              border-right: 1px solid rgba(1,8,11,0.2);
+            }
+          }
+          .close-icon-btn{
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            width: 30px;
+            cursor: pointer;
+            img{
+              width: 30px;
+              height:30px;
+              display: block;
+            }
+          }
+          // .chai_time{
+          //   left: auto!important;
+          //   right: 66px!important;
+          // }
+        }
+
+
         .chat_window_title {
           height: 65px;
           padding: 20px 15px 15px;
@@ -2368,7 +2866,7 @@ export default {
             color: #509ee2;
           }
           .chat_window_close {
-            width: 15%;
+            width: 5%;
             display: flex;
             line-height: 29px;
             cursor: pointer;
@@ -2376,7 +2874,8 @@ export default {
               width: 25%;
               padding-top: 3px;
               img {
-                width: 23px;
+                width: 26px;
+                height: 26px;
               }
             }
           }
@@ -2445,6 +2944,7 @@ export default {
                   .audio_music {
                     width: 300px !important;
                   }
+                  
                 }
               }
             }
@@ -2550,6 +3050,23 @@ export default {
           .chat_input_box {
             width: 660px;
             height: 130px;
+            .reply_box {
+              padding: 10px 20px 5px;
+              display: flex;
+              .quick_emjio {
+                width: 40px;
+                img {
+                  display: block;
+                  width: 24px;
+                }
+              }
+              .input_reply_message {
+                img {
+                  display: block;
+                  width: 24px;
+                }
+              }
+            }
           }
           .chat_star {
             position: absolute;
@@ -2574,6 +3091,98 @@ export default {
             float: right;
             font-size: 20px;
             margin-right: 15px;
+          }
+          .qucik-box {
+            width: 490px;
+            height: 220px;
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 1px 0px 5px rgba(1, 8, 11, 0.2);
+            position: absolute;
+            left: 3px;
+            top: -225px;
+            padding: 10px 14px 13px;
+            box-sizing: border-box;
+            .qucik-one {
+              display: flex;
+              line-height: 26px;
+              p {
+                font-size: 16px;
+                font-family: Adobe Heiti Std R;
+                font-weight: normal;
+                color: rgba(51, 51, 51, 1);
+              }
+              .el-select {
+                width: 68px;
+                margin-left: 68px;
+                .el-input__inner {
+                  line-height: 26px;
+                  height: 26px;
+                }
+              }
+            }
+            .el-textarea {
+              margin-top: 16px;
+              textarea {
+                padding: 0;
+                width: 462px;
+                height: 96px;
+                background: rgba(255, 255, 255, 1);
+                border: 1px solid rgba(142, 148, 157, 1);
+                padding: 10px;
+                box-sizing: border-box;
+              }
+            }
+            button {
+              margin: 14px auto;
+              float: none;
+              display: block;
+              width: 69px;
+              height: 36px;
+              border-radius: 4px;
+              font-size: 14px;
+              padding: 0;
+            }
+            .cose_btn {
+              position: absolute;
+              width: 25px;
+              right: 8px;
+              top: 8px;
+              cursor: pointer;
+              img {
+                width: 100%;
+                height: 25px;
+                display: block;
+              }
+            }
+          }
+          // 快捷回复列表样式
+          .qucik-list {
+            position: absolute;
+            bottom: 0;
+            right: -300px;
+            width: 300px;
+            height: 302px;
+            background: rgba(255, 255, 255, 1);
+            border: 1px solid rgba(142, 148, 157, 1);
+            overflow-y: auto;
+            box-sizing: border-box;
+            z-index:10;
+            ul {
+              li {
+                line-height: 30px;
+                padding: 0 16px;
+                p {
+                  width: 100%;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                }
+              }
+              li:hover {
+                background: rgba(241, 245, 248, 1);
+                cursor: pointer;
+              }
+            }
           }
         }
       }
@@ -2712,6 +3321,68 @@ export default {
     color: #333;
   }
 }
+
+.myCardStyle {
+                    .myCardStyleTop {
+                      display: flex;
+                      padding-bottom: 10px;
+                      .myCardStyleTopOne {
+                        width: 75px;
+                        img {
+                          width: 56px;
+                          height: 56px;
+                          display: block;
+                        }
+                      }
+                      .myCardStyleTopTwo {
+                        width: 200px;
+                        p {
+                          width: 200px;
+                          line-height: 28px;
+                          font-size: 18px;
+                          white-space: nowrap;
+                          overflow: hidden;
+                          text-overflow: ellipsis;
+                        }
+                        p:last-child {
+                          width: 200px;
+                          line-height: 28px;
+                          font-size: 16px;
+                        }
+                      }
+                    }
+                    .myCardStyleDwon {
+                      font-size: 14px;
+                      color: #8a8989;
+                      padding-top: 10px;
+                      border-top: 1px solid #8a8989;
+                    }
+                  }
+
+                  .histroy-box{
+                    .chat_message_list{
+                      .listpt{
+                        li{
+                          .chat_message_text{
+                            .text_content_box{
+                              .chai_text_data{
+                                background:rgba(241,245,248,1)!important;
+                                color:rgba(51,51,51,1)!important;
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                  .emotion_style{
+                    position: absolute;
+                    left: 0;
+                    top: -300px;
+                    height: 290px;
+                    width: 400px;
+                    background: #fff;
+                  }
 </style>
 
 

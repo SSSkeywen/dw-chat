@@ -499,6 +499,63 @@ const actions = {
             }
         })
     },
+
+    //快捷回复接口
+    [types.GETFASTREPLY]({ commit }, { fastReplyData, successCallback = () => { }, failCallback = () => { } }) {
+        axios({
+            method: 'post',
+            url: '/tpdwt_web/getFastReply.html',
+            data: fastReplyData,
+            "Content-Type": "multipart/form-data"
+        }).then((res) => {
+            var result = res.data
+            //    console.log(result)
+            if (result.responseCode == 0) {
+                // window.localStorage.setItem('userTsr', JSON.stringify(result.result))
+                successCallback(result.result)
+            } else {
+                failCallback()
+            }
+
+        }).catch(function (err) {
+
+            let res = err.response
+            if (err) {
+                console.log('快捷回复接口' + res)
+            }
+        })
+    },
+
+    //添加快捷回复接口
+    [types.ADDFASTREPLY]({ commit }, { addfastReplyData, successCallback = () => { }, failCallback = () => { } }) {
+        axios({
+            method: 'post',
+            url: '/tpdwt_web/addFastReply.html',
+            data: addfastReplyData,
+            "Content-Type": "multipart/form-data"
+        }).then((res) => {
+            var result = res.data
+            console.log(result)
+            if (result.responseCode == 0) {
+
+                // if (1=1) {
+                successCallback()
+                // console.log(result);
+                // } else {
+                // alert(result.result.errorMsg)
+                // }
+            } else {
+                failCallback()
+            }
+
+        }).catch(function (err) {
+
+            let res = err.response
+            if (err) {
+                console.log('添加快捷回复接口' + res)
+            }
+        })
+    },
 }
 
 const getters = {

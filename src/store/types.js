@@ -27,3 +27,8 @@ export const GETTSRHEAD = 'GETTSRHEAD'//更新头像 getTSRhead
 export const VOICERECORD = 'VOICERECORD'//生成图片方法名 getVoiceRecord
 export const GETCLIENTPHONENO = 'GETCLIENTPHONENO'//生成图片方法名 getVoiceRecord
 export const GETJHSMESSAGE = 'GETJHSMESSAGE'//计划书确认书 getJhsMessage
+
+
+//快捷回复接口
+export const GETFASTREPLY = 'GETFASTREPLY'//获取
+export const ADDFASTREPLY = 'ADDFASTREPLY'//添加

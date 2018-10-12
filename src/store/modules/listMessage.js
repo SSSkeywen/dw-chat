@@ -9,11 +9,13 @@ const state = {
     myChatData: '', //我自己
     nowChat: '',    //当前聊天
     chatRecordList: '',
+    hostoryChatRecordList: '',
     chatRecordMessageL: '',
     clientPortrayalData: '',
     clientFooterData: '',
     messageData: '',
-    getMoreMessage: ''
+    getMoreMessage: '',
+    getHistoryMoreMessage:''
 }
 const mutations = {
 
@@ -83,9 +85,13 @@ const actions = {
             "Content-Type": "multipart/form-data"
         }).then((res) => {
             var result = res.data
-            // console.log(result)
             if (result.responseCode == 0) {
-                state.chatRecordList = result.result
+                
+                if (result.msg == '1' || result.msg == '2'){
+                    state.hostoryChatRecordList = result.result
+                }else{
+                    state.chatRecordList = result.result
+                }
                 successCallback()
             } else {
                 console.log('客户列表聊天信息')
@@ -191,13 +197,16 @@ const actions = {
             "Content-Type": "multipart/form-data"
         }).then((res) => {
             var result = res.data
-            // console.log(result)
             if (result.responseCode == 0) {
-                state.getMoreMessage = result.result
+
+                if (result.msg == '1' || result.msg == '2') {
+                    state.getHistoryMoreMessage = result.result
+                } else {
+                    state.getMoreMessage = result.result
+                }
                 successCallback()
             } else {
                 failCallback()
-                // alert('列表未取到客户足迹')
             }
 
         }).catch(function (err) {
@@ -277,6 +286,9 @@ const getters = {
     chatRecordList(state) {
         return state.chatRecordList
     },
+    hostoryChatRecordList(state) {
+        return state.hostoryChatRecordList
+    },
     clientPortrayalData(state) {
         return state.clientPortrayalData
     },
@@ -288,6 +300,9 @@ const getters = {
     },
     getMoreMessage(state) {
         return state.getMoreMessage
+    },
+    getHistoryMoreMessage(state) {
+        return state.getHistoryMoreMessage
     },
 }
 export default {

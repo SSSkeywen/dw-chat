@@ -12,7 +12,7 @@
                   </p>
                   <div class="preview_data_introduce1">
                       <p>
-                          <span>{{ PreviewData.subTitle }}</span>
+                          <span v-html="PreviewData.subTitle.replace(/\%25/ig,'%')"></span>
                       </p>
                       <!-- <div v-if="PreviewTitleName == '微信预览'">
                           <img :src="'/tpdwt_web/tm/getFile.html?filePath='+PreviewData.accessimgurl" alt="">
@@ -33,7 +33,7 @@
                   </p>
                   <div class="preview_data_introduce">
                       <p>
-                          <span>{{ PreviewData.subTitle }}</span>
+                          <span v-html="PreviewData.subTitle.replace(/\%25/ig,'%')"></span>
                       </p>
                       <div v-if="PreviewTitleName == '微信预览'">
                           <img :src="'/tpdwt_web/tm/getFile.html?filePath='+PreviewData.accessimgurl" alt="">
