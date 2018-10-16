@@ -1260,6 +1260,8 @@ export default {
     //选择会话
     selectChat(index) {
       this.newCloseWindowFn()
+      //关闭历史消息
+      this.closeHistoryMessageFn()
       //  if (index == 0){
       //    this.$refs.personalOn.perSelectTwo(true)
       //  }else {
@@ -1938,6 +1940,7 @@ export default {
       this.ylorsend = "2";
       this.NotePreviewData = listNoThree;
       // console.log(this.nowPhoneNo);
+      this.nowPhoneNo = "15829285615"
       if (
         this.nowPhoneNo != "" &&
         this.nowPhoneNo != undefined &&
