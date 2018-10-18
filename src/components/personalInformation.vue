@@ -41,7 +41,7 @@
                                 
                                 <div v-if="cardListData.isCardSelect&&cardListData.ISOPENJHS=='1'">
                                     <ul>
-                                        <li class="new-li-list-two" v-for="(item,index) in booksListData" style="margin-left:10px;" :key="index">
+                                        <li class="new-li-list-two" v-for="(item,index) in cardListData.booksListData" style="margin-left:10px;" :key="index">
                                           <div v-if="item.isOpenClick" class="new-li-list-two-mengban"></div>
                                           <div style="display:flex;display:-webkit-flex;height:40px;" v-else class="new-li-list-two-mengban-two" >
                                             <div style="width:10%;height:40px;" @click="openPlanBooksContent(index,false)"></div>
@@ -82,7 +82,7 @@
                                 </div>
                                 <div v-if="cardListData.isCardSelect&&cardListData.ISOPENJHS=='1'">
                                     <ul>
-                                        <li class="new-li-list-two" v-for="(item,index) in booksListData"  style="margin-left:10px;" :key="index">
+                                        <li class="new-li-list-two" v-for="(item,index) in cardListData.booksListData"  style="margin-left:10px;" :key="index">
                                           <div v-if="item.isOpenClick" class="new-li-list-two-mengban"></div>
                                           <div v-else style="display:flex;display:-webkit-flex;height:40px;" class="new-li-list-two-mengban-two" >
                                             <div style="width:10%;height:40px;" @click="openPlanBooksContent(index,false)"></div>
@@ -245,6 +245,9 @@ const log = console.log
 export default {
   data() {
     return {
+      isMineClick :false,
+      nowNewNum:1,
+      nowLongBx:'',  //当前保险ID
       booksListContent:{
         NAME:'',
         sex:'',
@@ -264,7 +267,7 @@ export default {
       starNum:'',
       starNumTwo:'',
       booksListData: [{
-        isOpenClick:true,
+        isOpenClick:false,
         booksName:'产品简介',
         isBooksSelect: true,
       },{
@@ -410,45 +413,46 @@ export default {
     "isJudge"
   ],
   created() {
+    
+    this.enterPage();
     this.modelListData(1);
-    this.enterPage()
+  },
+  mounted(){
+    this.getJhsMessageFntwo()
   },
   methods: {
     ...mapActions({
       modelList: types.MODELLIST,
       getJhsMessageFn: types.GETJHSMESSAGE,
     }),
+
+
     //点击我自己时所有的都不能发送
     clickMines(){
-      for(let item of this.booksListData){
-        item.isOpenClick = true
+      this.isMineClick = false;
+      for(let i=0;i<this.selectableListData.length;i++){
+        for(let j=0;j<this.selectableListData[i].temlist.length;j++){
+          for(let item of this.selectableListData[i].temlist[j].booksListData){
+            item.isOpenClick = true
+          }
+        }
       }
     },
+
+
     //进入页面加载的是否有发送
     enterPage(){
       this.starNum = this.$utils.getUrlKey("content");
       this.starNumTwo = JSON.parse(this.starNum)
-      // console.log(this.starNumTwo)
       this.policyType=this.starNumTwo.policyType
       this.policyCode=this.starNumTwo.tempPolicyNum
-      if(this.policyType==''||this.policyType==undefined ||this.policyType==null||this.policyCode==''||this.policyCode==undefined ||this.policyCode==null){
-        for(let item of this.booksListData){
-          item.isOpenClick = true
-        }
-      }else{
-        let policyTypeNo = this.policyType
-        policyTypeNo--
-        // console.log(this.booksListData[policyTypeNo])
-        this.booksListData[0].isOpenClick = false
-        this.booksListData[policyTypeNo].isOpenClick = false
-      }
+      this.isMineClick = true;
     },
     //足迹添加样式内容
     clientFooterList() {},
     //可选内容区选择事件
     Designate(index) {
       this.listOneNo = index;
-      //   alert(this.listOneNo)
       if (this.selectableListData[index].isShowContent == false) {
         for (let i = 0; i < this.selectableListData.length; i++) {
           this.selectableListData[i].pitchOn = "";
@@ -463,7 +467,8 @@ export default {
     },
     //获取民片内容
     modelListData(num) {
-      //   console.log(this.clientPortrayalDataList)
+      this.nowNewNum = num
+        // console.log(this.clientPortrayalDataList)
       //   this.geshu = this.clientPortrayalDataList.length
       //console.log(num)
       let modelListWechat = new FormData();
@@ -471,20 +476,43 @@ export default {
       this.modelList({
         modelListWechat,
         successCallback: () => {
-          // console.log(this.$store.getters.cardListData);
+          let policyTypeNum = this.policyType
+          policyTypeNum--
+          // console.log()
+          for(let i = 0; i < this.$store.getters.cardListData.length; i++){
+            for(let j = 0 ; j< this.$store.getters.cardListData[i].temlist.length; j++){
+              this.$store.getters.cardListData[i].temlist[j].booksListData = this.booksListData
+            }
+          }
+
+          for(let i = 0; i < this.$store.getters.cardListData.length; i++){
+            for(let j = 0 ; j< this.$store.getters.cardListData[i].temlist.length; j++){
+              if(this.$store.getters.cardListData[i].temlist[j].INSURANCECODE == this.nowLongBx){
+                // this.$store.getters.cardListData[i].temlist[j].booksListData[policyTypeNum].isOpenClick = false
+              }
+            }
+          }
+
+
           for (let i = 0; i < this.$store.getters.cardListData.length; i++) {
             this.$store.getters.cardListData[i].temlist.isCardSelect = false;
-            this.selectableListData[
-              i
-            ].temlist = this.$store.getters.cardListData[i].temlist;
+            // this.selectableListData[
+            //   i
+            // ].temlist = this.$store.getters.cardListData[i].temlist;
+
+            this.$set(
+              this.selectableListData[i],
+              'temlist',this.$store.getters.cardListData[i].temlist
+            );
           }
+          // console.log(this.nowLongBx)
+          // console.log(this.selectableListData)
         },
         failCallback: () => {}
       });
     },
     //顶部切换
     titleOPeration(index) {
-      //console.log(this.selectableListData)
       if (index === 0) {
         for (let i = 0; i < this.titleLists.length; i++) {
           this.titleLists[i].titleClass = "";
@@ -539,22 +567,15 @@ export default {
       if (this.isSms) {
         return false;
       }
-      //  console.log('=====================')
-      //   console.log(this.$refs.perNew.style.left)
-      //   this.pitchDataNo = index
-      //   this.isShowSelect = !this.isShowSelect
       if (this.$refs.perNew.style.left == "50%") {
         this.isShowSelect = false;
         this.modelListData(1);
-        //   console.log(this.$refs.perNew)
         this.$refs.perNew.style.left = "0%";
       } else {
         this.isShowSelect = true;
         this.modelListData(2);
         this.$refs.perNew.style.left = "50%";
       }
-
-      //   this.$refs.perBoxSelect.children.removeClass('pitch_on')
     },
     //微信预览
     WechatPreview() {
@@ -615,6 +636,8 @@ export default {
     //民片选择
     selectCard(index) {
       this.listTwoNo = index;
+      let policyTypeNum = this.policyType
+          policyTypeNum--
       for (let i = 0; i < this.selectableListData.length; i++) {
         //   console.log(this.selectableListData[i].temlist.length)
         for (let j = 0; j < this.selectableListData[i].temlist.length; j++) {
@@ -622,11 +645,17 @@ export default {
         }
       }
       if(this.selectableListData[this.listOneNo].temlist[this.listTwoNo].ISOPENJHS=='1'){
-        for(let item of this.booksListData){
+        for(let item of this.selectableListData[this.listOneNo].temlist[this.listTwoNo].booksListData){
           item.isBooksSelect = false
         }
-        this.booksListData[0].isBooksSelect = true
+        this.selectableListData[this.listOneNo].temlist[this.listTwoNo].booksListData[0].isBooksSelect = true
         this.selectableListData[this.listOneNo].temlist[this.listTwoNo].booksCode = '0'
+        if(this.selectableListData[this.listOneNo].temlist[this.listTwoNo].INSURANCECODE == this.nowLongBx&&this.isMineClick){
+          this.selectableListData[this.listOneNo].temlist[this.listTwoNo].booksListData[policyTypeNum].isOpenClick = false
+        }else{
+          this.selectableListData[this.listOneNo].temlist[this.listTwoNo].booksListData[policyTypeNum].isOpenClick = true
+        }
+
       }
       this.selectableListData[this.listOneNo].temlist[this.listTwoNo].booksCode = '0'
       this.selectableListData[this.listOneNo].temlist[
@@ -639,13 +668,8 @@ export default {
       );
 
       this.listNoThree = this.selectableListData[this.listOneNo].temlist[this.listTwoNo]
-      // console.log(this.selectableListData[this.listOneNo].temlist[this.listTwoNo])
-      //   this.selectableListData[this.listOneNo].temlist[this.listTwoNo].isCardSelect = true
-      //   alert(this.selectableListData[this.listOneNo].temlist[this.listTwoNo].isCardSelect)
-      // this.selectableListData[this.listOneNo].pitchOn = 'pitch_on_li'
-      // this.selectableListData[this.listOneNo].isShowContent = true
-      // this.Designate(this.listOneNo)
     },
+
     //
     getJhsMessageFntwo(){
       let planData = new FormData();
@@ -654,7 +678,8 @@ export default {
       this.getJhsMessageFn({
         planData,
         successCallback: (result) => {
-          // console.log(result);
+          this.nowLongBx = result.PTS[0].PT.ID
+
           if(result.SEX == '1'){
             result.sex = '先生'
           }else{
@@ -663,7 +688,7 @@ export default {
           // console.log(result.PTS[0].PT.PAY_T)
           result.PREMIUM = 0
           for(let i = 0;i < result.PTS.length; i ++ ){
-            if(result.PTS[i].PT.ID == '5077'){
+            if(result.PTS[i].PT.ID == this.nowLongBx){
               if(result.PTS[i].PT.PAY_T == '0'){
                 result.PAY_T_style = '无关或不确定'
               }else if(result.PTS[i].PT.PAY_T == '1'){
@@ -744,9 +769,7 @@ export default {
           let nowYear = new Date()
           result.age = nowYear.getFullYear()-result.BIRTH.slice(0,4)
           result.MAINTITLE = this.selectableListData[this.listOneNo].temlist[this.listTwoNo].MAINTITLE
-
           this.booksListContent = result
-          // console.log(result)
         },
         failCallback: () => {}
       });

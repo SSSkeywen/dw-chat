@@ -594,7 +594,7 @@ export default {
     this.goOnFnTwo();
     this.bottomshow();
     this.judge();
-    this.selsectWindow();
+    // this.selsectWindow();
 
     this.getFastReplyFnBox()
     // this.clickPt()
@@ -1405,7 +1405,10 @@ export default {
       if (index == "0") {
         // console.log(index)
         this.$refs.personalOn.perSelectTwo(true, true);
-        this.$refs.personalOn.clickMines();
+        setTimeout(()=>{
+          this.$refs.personalOn.clickMines();
+        },1000)
+        
       } else {
         this.$refs.personalOn.enterPage();
         }
