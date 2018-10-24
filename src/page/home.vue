@@ -1237,6 +1237,7 @@ export default {
           }
           // this.tsrCardMessage()
           this.selectClientNameData();
+          this.getFastReplyFnBox()
         },
         failCallback: () => {}
       });

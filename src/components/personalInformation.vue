@@ -418,7 +418,7 @@ export default {
     this.modelListData(1);
   },
   mounted(){
-    this.getJhsMessageFntwo()
+    
   },
   methods: {
     ...mapActions({
@@ -442,11 +442,17 @@ export default {
 
     //进入页面加载的是否有发送
     enterPage(){
+      // return false
       this.starNum = this.$utils.getUrlKey("content");
       this.starNumTwo = JSON.parse(this.starNum)
-      this.policyType=this.starNumTwo.policyType
-      this.policyCode=this.starNumTwo.tempPolicyNum
-      this.isMineClick = true;
+      if(this.starNumTwo.tempPolicyNum){
+        this.policyType=this.starNumTwo.policyType
+        this.policyCode=this.starNumTwo.tempPolicyNum
+        this.isMineClick = true;
+
+        this.getJhsMessageFntwo()
+      }
+      
     },
     //足迹添加样式内容
     clientFooterList() {},
