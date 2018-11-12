@@ -29,14 +29,18 @@
                       <!-- <div v-for="(cardList, index) in item.selectableContent.temlist" :key="index"> -->
                         <ul class="my_card_list">
                             <li class="new-li-list" v-for="(cardListData, indexTwo) in item.temlist" :key="indexTwo">
-                                <div class="my_card_list_img"  @click="selectCard(indexTwo)">
+                                <div class="my_card_list_img"  style="background: rgba(255, 255, 255, 0.3);z-index:5;" v-if="(cardListData.ISOPENJHS=='4'||starNumTwo.position!='TSR')&&(cardListData.ISOPENJHS=='4'||cardListData.ISOPENJHS=='3')">
+                                </div>
+                                <div class="my_card_list_img"  style="background: rgba(255, 255, 255, 0.3);z-index:5;" v-else-if="!isMineClick&&(cardListData.ISOPENJHS=='4'||cardListData.ISOPENJHS=='3')">
+                                </div>
+                                <div class="my_card_list_img"  @click="selectCard(indexTwo)" v-else>
                                 </div>
                                 <div class="new-li-list-div">
                                     <div class="card_checkbox">
                                       <div  v-if="cardListData.ISOPENJHS=='1'"  class="icon_two"><i class="iconfont icon-xiangxia2"></i></div>
                                         <el-checkbox v-else v-model="cardListData.isCardSelect"></el-checkbox>
                                     </div>
-                                    <p>{{ cardListData.SLUG}}</p>
+                                    <p :class="(((cardListData.ISOPENJHS=='4'||starNumTwo.position!='TSR')&&(cardListData.ISOPENJHS=='4'||cardListData.ISOPENJHS=='3'))||(!isMineClick&&(cardListData.ISOPENJHS=='4'||cardListData.ISOPENJHS=='3')))?'disableColor':''">{{ cardListData.SLUG}}</p>
                                 </div>
                                 
                                 <div v-if="cardListData.isCardSelect&&cardListData.ISOPENJHS=='1'">
@@ -50,7 +54,7 @@
                                             <div class="card_checkbox">
                                                 <el-checkbox v-model="item.isBooksSelect"></el-checkbox>
                                             </div>
-                                            <p>{{item.booksName}}</p>
+                                            <p :class="item.isOpenClick?'disableColor':''">{{item.booksName}}</p>
                                         </li>
                                     </ul>
                                 </div>
@@ -91,7 +95,7 @@
                                             <div class="card_checkbox">
                                                 <el-checkbox v-model="item.isBooksSelect"></el-checkbox>
                                             </div>
-                                            <p>{{item.booksName}}</p>
+                                            <p :class="item.isOpenClick?'disableColor':''">{{item.booksName}}</p>
                                         </li>
                                     </ul>
                                 </div>
@@ -416,6 +420,7 @@ export default {
     
     this.enterPage();
     this.modelListData(1);
+    this.getJhsMessageFntwo()
   },
   mounted(){
     
@@ -435,6 +440,7 @@ export default {
           for(let item of this.selectableListData[i].temlist[j].booksListData){
             item.isOpenClick = true
           }
+          this.selectableListData[i].temlist[j].booksListData[0].isOpenClick = false
         }
       }
     },
@@ -445,12 +451,14 @@ export default {
       // return false
       this.starNum = this.$utils.getUrlKey("content");
       this.starNumTwo = JSON.parse(this.starNum)
+      // console.log(this.starNumTwo)
+      this.isMineClick = true;
       if(this.starNumTwo.tempPolicyNum){
         this.policyType=this.starNumTwo.policyType
         this.policyCode=this.starNumTwo.tempPolicyNum
         this.isMineClick = true;
-
-        this.getJhsMessageFntwo()
+        
+        
       }
       
     },
@@ -658,8 +666,10 @@ export default {
         this.selectableListData[this.listOneNo].temlist[this.listTwoNo].booksCode = '0'
         if(this.selectableListData[this.listOneNo].temlist[this.listTwoNo].INSURANCECODE == this.nowLongBx&&this.isMineClick){
           this.selectableListData[this.listOneNo].temlist[this.listTwoNo].booksListData[policyTypeNum].isOpenClick = false
+          this.selectableListData[this.listOneNo].temlist[this.listTwoNo].booksListData[0].isOpenClick = false
         }else{
           this.selectableListData[this.listOneNo].temlist[this.listTwoNo].booksListData[policyTypeNum].isOpenClick = true
+          this.selectableListData[this.listOneNo].temlist[this.listTwoNo].booksListData[0].isOpenClick = false
         }
 
       }
@@ -678,6 +688,10 @@ export default {
 
     //
     getJhsMessageFntwo(){
+      if(!this.starNumTwo.tempPolicyNum){
+        return false
+      }
+      // console.log(1)
       let planData = new FormData();
       planData.append("policyType", this.policyType);
       planData.append("policyCode", this.policyCode);
@@ -1348,6 +1362,9 @@ export default {
       }
     }
   }
+}
+.disableColor{
+  color: #908b8b;
 }
 </style>
 

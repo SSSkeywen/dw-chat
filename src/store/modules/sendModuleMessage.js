@@ -535,7 +535,7 @@ const actions = {
             "Content-Type": "multipart/form-data"
         }).then((res) => {
             var result = res.data
-            console.log(result)
+            //console.log(result)
             if (result.responseCode == 0) {
 
                 // if (1=1) {

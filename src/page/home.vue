@@ -594,7 +594,7 @@ export default {
     this.goOnFnTwo();
     this.bottomshow();
     this.judge();
-    // this.selsectWindow();
+    this.selsectWindow();
 
     this.getFastReplyFnBox()
     // this.clickPt()
@@ -801,13 +801,13 @@ export default {
       addfastReplyData.append("serialnum", this.qucikValue);
       addfastReplyData.append("content", this.qucikListsNow);
       addfastReplyData.append("id", this.qucikLists[qucikNum].ID);
-      console.log(this.qucikListsNow)
-      console.log(userTsrL.TSR_SESSION.tsrno)
-      console.log(this.qucikValue)
+      // console.log(this.qucikListsNow)
+      // console.log(userTsrL.TSR_SESSION.tsrno)
+      // console.log(this.qucikValue)
       this.addFastReplyFn({
         addfastReplyData,
         successCallback: () => {
-          console.log(this.qucikListsNow)
+          // console.log(this.qucikListsNow)
           let qucikNum = this.qucikValue
           qucikNum--
           this.$set(
@@ -1408,7 +1408,7 @@ export default {
         this.$refs.personalOn.perSelectTwo(true, true);
         setTimeout(()=>{
           this.$refs.personalOn.clickMines();
-        },1000)
+        },200)
         
       } else {
         this.$refs.personalOn.enterPage();
@@ -1616,8 +1616,10 @@ export default {
     //获取客户足迹
     clientFooterDataL() {
       // console.log(chatRecordMessageL)
+      let userTsrL = JSON.parse(window.localStorage.getItem("userTsr"));
       let chatRecordMessageL = new FormData();
       chatRecordMessageL.append("openId", this.nowOpenIdData);
+      chatRecordMessageL.append("tsrNo", userTsrL.TSR_SESSION.tsrno);
       this.clientFooter({
         chatRecordMessageL,
         successCallback: () => {
@@ -1944,7 +1946,6 @@ export default {
       this.ylorsend = "2";
       this.NotePreviewData = listNoThree;
       // console.log(this.nowPhoneNo);
-      this.nowPhoneNo = "15829285615"
       if (
         this.nowPhoneNo != "" &&
         this.nowPhoneNo != undefined &&
@@ -1995,7 +1996,7 @@ export default {
     sendNoteData(NoteDatatDir) {
       this.ylorsend = "1";
       this.NotePreviewData = NoteDatatDir;
-      console.log(this.nowPhoneNo);
+      // console.log(this.nowPhoneNo);
       if (
         this.nowPhoneNo != "" &&
         this.nowPhoneNo != undefined &&
@@ -2011,7 +2012,7 @@ export default {
         this.getClientPhoneNoFn({
           getPhoneNoData,
           successCallback: result => {
-            console.log(result)
+            // console.log(result)
             // if(result.length != '0'){
             this.phoneListData.length = 0;
             for (let item of result) {
@@ -2148,7 +2149,7 @@ export default {
           sendMessageContent.MsgType = "3";
           sendMessageContent.sendStatus = "1";
           sendMessageContent.imgurl = this.PreviewData.accessimgurl;
-          sendMessageContent.mainTitle = this.PreviewData.slug;
+          sendMessageContent.mainTitle = this.PreviewData.mainTitle;
           sendMessageContent.subTitle = this.PreviewData.subTitle;
           sendMessageContent.moduleName = this.PreviewData.moduleName;
           // console.log(sendMessageContent)
@@ -2173,7 +2174,7 @@ export default {
           sendMessageContent.MsgType = "3";
           sendMessageContent.sendStatus = "-1";
           sendMessageContent.imgurl = this.PreviewData.accessimgurl;
-          sendMessageContent.mainTitle = this.PreviewData.slug;
+          sendMessageContent.mainTitle = this.PreviewData.mainTitle;
           sendMessageContent.subTitle = this.PreviewData.subTitle;
           sendMessageContent.moduleName = this.PreviewData.moduleName;
           this.mesageList.push(sendMessageContent);
@@ -2205,7 +2206,7 @@ export default {
       NoteDatat.openid = this.nowOpenIdData;
 
       NoteDatat = JSON.stringify(NoteDatat);
-     console.log(NoteDatat);
+    //  console.log(NoteDatat);
       var NoteData = new FormData();
       NoteData.append("showtmData", NoteDatat);
       var showtmData = new FormData();
@@ -2374,7 +2375,7 @@ export default {
       let sendMessageContentD = JSON.stringify(sendMessageContent);
       var sendMessage = new FormData();
       sendMessage.append("sendMessage", sendMessageContentD);
-      console.log("------------->" + sendMessageContentD);
+      // console.log("------------->" + sendMessageContentD);
       this.sendMessageData({
         sendMessage,
         successCallback: () => {
@@ -2474,6 +2475,7 @@ export default {
           successCallback: customerKey => {
             this.iframeNameData =
               "http://10.4.211.11/WeChatNestPage.html?customerKey=" +
+              // "http://10.1.118.61/WeChatNestPage.html?customerKey=" +
               customerKey;
           },
           failCallback: () => {}
